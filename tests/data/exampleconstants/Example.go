@@ -5,9 +5,11 @@ const (
 )
 
 const (
+	// Comment Test ExampleString
 	ExampleString = "example"
 )
 
 const (
+	//TrueConstant is true
 	TrueConstant = true
 )

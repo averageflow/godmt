@@ -4,4 +4,4 @@ The goal of this repository is to provide a tool that can parse Go files that in
 
 That AST will then be transformed into data models for several programming languages.
 
-Comments will be carried over :).
+Comments will be carried over :)
