@@ -7,6 +7,10 @@ import (
 	"reflect"
 )
 
+func parseStruct(){
+
+}
+
 func parseConstantsAndVariables(d *ast.Ident) []RawScannedType {
 	var result []RawScannedType
 
@@ -72,12 +76,12 @@ func parseConstantsAndVariables(d *ast.Ident) []RawScannedType {
 			case *ast.MapType:
 
 				mapElements := reflect.ValueOf(item.Elts).Interface().([]ast.Expr)
-				cleanMap := make(map[interface{}]interface{})
+				cleanMap := make(map[string]interface{})
 
 				for j := range mapElements {
 					rawKey := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Key").Interface().(*ast.BasicLit)
 					rawValue := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Value").Interface().(*ast.BasicLit)
-					cleanMap[rawKey.Value] = rawValue.Value
+					cleanMap[fmt.Sprintf("%v", rawKey.Value)] = rawValue.Value
 				}
 
 				var doc []string
@@ -87,7 +91,6 @@ func parseConstantsAndVariables(d *ast.Ident) []RawScannedType {
 					for i := range rawDecl.Doc.List {
 						doc = append(doc, rawDecl.Doc.List[i].Text)
 					}
-
 				}
 
 				result = append(result, RawScannedType{
