@@ -38,7 +38,7 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 
 		break
 	}
-	//fmt.Printf("(POS: %d) %s%T\n", n.Pos(), strings.Repeat("\t", int(v)), n)
+	//fmt.Printf("%s%T\n", strings.Repeat("\t", int(v)), n)
 	return v + 1
 }
 
@@ -51,9 +51,14 @@ func (v visitor) ParseConstantsAndVariables(d *ast.Ident) {
 		switch values[i].(type) {
 		case *ast.BasicLit:
 			item := values[i].(*ast.BasicLit)
+			itemType := fmt.Sprintf("%T", item.Value)
+			if item.Kind == token.INT {
+				itemType = "int"
+			}
+
 			fmt.Printf("%+v\n", ParsedEnum{
 				Name:  d.Name,
-				Kind:  fmt.Sprintf("%T", item.Value),
+				Kind:  itemType,
 				Value: item.Value,
 			})
 		case *ast.Ident:
