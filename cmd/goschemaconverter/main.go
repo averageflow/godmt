@@ -1,27 +1,44 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
 	"github.com/averageflow/goschemaconverter/internal/translators"
 	"go/parser"
 	"go/token"
 	"log"
+	"os"
+	"path/filepath"
 )
 
-func main() {
-	files := []string{
-		"../../tests/data/examplevars/Example.go",
-		"../../tests/data/exampleconstants/Example.go",
+func scanDir(path string, info os.FileInfo, err error) error {
+	if err != nil {
+		return err
+	}
+	if info.IsDir() {
+		return nil
 	}
 
-	for i := range files {
-		fset := token.NewFileSet()
-		f, err := parser.ParseFile(fset, files[i], nil, parser.ParseComments)
-		if err != nil {
-			log.Fatal(err)
-		}
+	fmt.Printf("FILE: %s", path)
 
-		syntaxtree.WalkSyntaxTree(f)
+	fset := token.NewFileSet()
+	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	syntaxtree.WalkSyntaxTree(f)
+	fmt.Println(path, info.Size())
+	return nil
+}
+func main() {
+	scanPath := flag.String("dir", ".", "directory to scan")
+	flag.Parse()
+
+	err := filepath.Walk(*scanPath, scanDir)
+	if err != nil {
+		log.Println(err)
 	}
 
 	ts := translators.TypeScriptTranslator{}

@@ -14,9 +14,9 @@ func (t *TypeScriptTranslator) Setup(d []syntaxtree.RawScannedType) {
 }
 
 func (t *TypeScriptTranslator) Translate() string {
-	fmt.Println("Performing TypeScript translation!")
-	stringRepresentation := fmt.Sprintf("%+v", t.raw)
-	fmt.Printf("%+v\n", stringRepresentation)
+	fmt.Println("-----------------\nPerforming TypeScript translation!\n-----------------")
+	//stringRepresentation := fmt.Sprintf("%+v", t.raw)
+	//fmt.Printf("%+v\n", stringRepresentation)
 
 	var result string
 

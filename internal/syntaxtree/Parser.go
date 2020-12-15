@@ -11,6 +11,9 @@ func parseConstantsAndVariables(d *ast.Ident) []RawScannedType {
 	var result []RawScannedType
 
 	objectValues := reflect.ValueOf(d.Obj.Decl).Elem().FieldByName("Values")
+	if !objectValues.IsValid() {
+		return result
+	}
 
 	values := objectValues.Interface().([]ast.Expr)
 
@@ -88,11 +91,11 @@ func parseConstantsAndVariables(d *ast.Ident) []RawScannedType {
 				}
 
 				result = append(result, RawScannedType{
-					Name:  d.Name,
-					Kind:  fmt.Sprintf("map[%s]%s", item.Type.(*ast.MapType).Key.(*ast.Ident).Name, item.Type.(*ast.MapType).Value.(*ast.Ident).Name),
-					Value: cleanMap,
+					Name:         d.Name,
+					Kind:         fmt.Sprintf("map[%s]%s", item.Type.(*ast.MapType).Key.(*ast.Ident).Name, item.Type.(*ast.MapType).Value.(*ast.Ident).Name),
+					Value:        cleanMap,
 					InternalType: MapType,
-					Doc: doc,
+					Doc:          doc,
 				})
 			}
 		}
