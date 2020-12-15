@@ -2,19 +2,32 @@ package main
 
 import (
 	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
+	"github.com/averageflow/goschemaconverter/internal/translators"
 	"go/parser"
 	"go/token"
 	"log"
 )
 
 func main() {
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, "../../tests/data/exampleconstants/Example.go", nil, parser.ParseComments)
-	if err != nil {
-		log.Fatal(err)
+	files := []string{
+		"../../tests/data/examplevars/Example.go",
+		"../../tests/data/exampleconstants/Example.go",
 	}
 
-	syntaxtree.WalkSyntaxTree(f)
+	for i := range files {
+		fset := token.NewFileSet()
+		f, err := parser.ParseFile(fset, files[i], nil, parser.ParseComments)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		syntaxtree.WalkSyntaxTree(f)
+	}
+
+	ts := translators.TypeScriptTranslator{}
+	ts.Setup(syntaxtree.ScanResult)
+	ts.Translate()
+
 }
 
 /*

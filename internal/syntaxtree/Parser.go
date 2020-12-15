@@ -7,7 +7,9 @@ import (
 	"reflect"
 )
 
-func parseConstantsAndVariables(d *ast.Ident) {
+func parseConstantsAndVariables(d *ast.Ident) []RawScannedType {
+	var result []RawScannedType
+
 	objectValues := reflect.ValueOf(d.Obj.Decl).Elem().FieldByName("Values")
 
 	values := objectValues.Interface().([]ast.Expr)
@@ -32,7 +34,7 @@ func parseConstantsAndVariables(d *ast.Ident) {
 				}
 			}
 
-			fmt.Printf("%+v\n", RawScannedType{
+			result = append(result, RawScannedType{
 				Name:         d.Name,
 				Kind:         itemType,
 				Value:        item.Value,
@@ -53,7 +55,7 @@ func parseConstantsAndVariables(d *ast.Ident) {
 			}
 
 			if item.Name == "true" || item.Name == "false" {
-				fmt.Printf("%+v\n", RawScannedType{
+				result = append(result, RawScannedType{
 					Name:         d.Name,
 					Kind:         "bool",
 					Value:        item.Name,
@@ -75,12 +77,26 @@ func parseConstantsAndVariables(d *ast.Ident) {
 					cleanMap[rawKey.Value] = rawValue.Value
 				}
 
-				fmt.Printf("%+v\n", RawScannedType{
+				var doc []string
+
+				rawDecl := reflect.ValueOf(d.Obj.Decl).Elem().Interface().(ast.ValueSpec)
+				if rawDecl.Doc != nil {
+					for i := range rawDecl.Doc.List {
+						doc = append(doc, rawDecl.Doc.List[i].Text)
+					}
+
+				}
+
+				result = append(result, RawScannedType{
 					Name:  d.Name,
 					Kind:  fmt.Sprintf("map[%s]%s", item.Type.(*ast.MapType).Key.(*ast.Ident).Name, item.Type.(*ast.MapType).Value.(*ast.Ident).Name),
 					Value: cleanMap,
+					InternalType: MapType,
+					Doc: doc,
 				})
 			}
 		}
 	}
+
+	return result
 }

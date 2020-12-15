@@ -9,6 +9,7 @@ var (
 var (
 	// ExampleString is a nice example
 	ExampleString = "example"
+	// This map also deserves a comment
 	MapTest       = map[string]string{
 		"test": "example",
 	}

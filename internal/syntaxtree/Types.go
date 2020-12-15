@@ -2,22 +2,23 @@ package syntaxtree
 
 import "go/ast"
 
-const(
-	MapType = 1
-	VarType = 2
+const (
+	MapType   = 1
+	VarType   = 2
 	ConstType = 3
-
 )
 
 type RawScannedType struct {
-	Name  string
-	Kind  string
-	Value interface{}
-	Doc []string
+	Name         string
+	Kind         string
+	Value        interface{}
+	Doc          []string
 	InternalType int
 }
 
 type visitor int
+
+var ScanResult []RawScannedType
 
 func (v visitor) Visit(n ast.Node) ast.Visitor {
 	if n == nil {
@@ -35,7 +36,11 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 		}
 
 		if d.Obj.Kind == ast.Con || d.Obj.Kind == ast.Var {
-			parseConstantsAndVariables(d)
+			result := parseConstantsAndVariables(d)
+
+			for i := range result {
+				ScanResult = append(ScanResult, result[i])
+			}
 		}
 
 		break
