@@ -15,6 +15,9 @@ func WalkSyntaxTree(f *ast.File) {
 	ast.Walk(v, f)
 }
 
+var ScanResult []ScannedType
+var StructScanResult []ScannedStruct
+
 // Visit represents the actions to be performed on every node of the tree
 // n represents the node, whose type can be obtained with fmt.Sprintf and %T
 func (v visitor) Visit(n ast.Node) ast.Visitor {
@@ -30,6 +33,11 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 
 		if d.Obj.Kind == ast.Typ {
 			fmt.Printf("type: %T, value: %+v\n", d.Obj, d.Obj)
+			result := parseStruct(d)
+
+			for i := range result {
+				StructScanResult = append(StructScanResult, result[i])
+			}
 		}
 
 		if d.Obj.Kind == ast.Con || d.Obj.Kind == ast.Var {
@@ -44,7 +52,6 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 	}
 	return v + 1
 }
-
 
 func ScanDir(path string, info os.FileInfo, err error) error {
 	if err != nil {

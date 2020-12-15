@@ -10,5 +10,5 @@ const (
 
 type TypeTranslator interface {
 	Translate() string
-	Setup(d []syntaxtree.RawScannedType)
+	Setup(d []syntaxtree.ScannedType)
 }

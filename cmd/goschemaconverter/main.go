@@ -23,13 +23,13 @@ func main() {
 	switch *translateMode {
 	case translators.JSONTranslationMode:
 		j := translators.JSONTranslator{}
-		j.Setup(syntaxtree.ScanResult)
+		j.Setup(syntaxtree.ScanResult, syntaxtree.StructScanResult)
 		j.Translate()
 		break
 	case translators.TypeScriptTranslationMode:
 	case translators.TSTranslationMode:
 		ts := translators.TypeScriptTranslator{}
-		ts.Setup(syntaxtree.ScanResult)
+		ts.Setup(syntaxtree.ScanResult, syntaxtree.StructScanResult)
 		ts.Translate()
 		break
 	}

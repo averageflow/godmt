@@ -7,12 +7,64 @@ import (
 	"reflect"
 )
 
-func parseStruct(){
+func parseStruct(d *ast.Ident) []ScannedStruct {
+	var result []ScannedStruct
 
+	structTypes := reflect.ValueOf(d.Obj.Decl).Elem().FieldByName("Type")
+	if !structTypes.IsValid() {
+		return result
+	}
+
+	fields := structTypes.Interface().(*ast.StructType)
+	fieldList := fields.Fields.List
+
+	var rawScannedFields []ScannedStructField
+
+	for i := range fieldList {
+		switch fieldList[i].Type.(type) {
+		case *ast.Ident:
+			fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Name")
+			rawScannedFields = append(rawScannedFields, ScannedStructField{
+				Doc:  nil,
+				Name: fieldList[i].Names[0].Name,
+				Kind: fieldType.Interface().(string),
+				Tag:  fieldList[i].Tag.Value,
+			})
+		case *ast.StructType:
+			fmt.Println("TODO: Support nested structs!")
+			break
+			/*fmt.Printf("%+v", fieldList[i])
+			item := fieldList[i].Type.(*ast.StructType)
+			itemFields := item.Fields.List
+
+			var subStruct *ScannedStruct
+
+			if len(itemFields) > 0 {
+
+			}
+
+			rawScannedFields = append(rawScannedFields, ScannedStructField{
+				Name:      fieldList[i].Names[0].Name,
+				Kind:      "struct",
+				Tag:       fieldList[i].Tag.Value,
+				Doc:       nil,
+				SubStruct: subStruct,
+			})*/
+		}
+	}
+
+	result = append(result, ScannedStruct{
+		Doc:          nil,
+		Name:         d.Name,
+		Fields:       rawScannedFields,
+		InternalType: StructType,
+	})
+
+	return result
 }
 
-func parseConstantsAndVariables(d *ast.Ident) []RawScannedType {
-	var result []RawScannedType
+func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
+	var result []ScannedType
 
 	objectValues := reflect.ValueOf(d.Obj.Decl).Elem().FieldByName("Values")
 	if !objectValues.IsValid() {
@@ -41,7 +93,7 @@ func parseConstantsAndVariables(d *ast.Ident) []RawScannedType {
 				}
 			}
 
-			result = append(result, RawScannedType{
+			result = append(result, ScannedType{
 				Name:         d.Name,
 				Kind:         itemType,
 				Value:        item.Value,
@@ -58,11 +110,10 @@ func parseConstantsAndVariables(d *ast.Ident) []RawScannedType {
 				for i := range rawDecl.Doc.List {
 					doc = append(doc, rawDecl.Doc.List[i].Text)
 				}
-
 			}
 
 			if item.Name == "true" || item.Name == "false" {
-				result = append(result, RawScannedType{
+				result = append(result, ScannedType{
 					Name:         d.Name,
 					Kind:         "bool",
 					Value:        item.Name,
@@ -93,7 +144,7 @@ func parseConstantsAndVariables(d *ast.Ident) []RawScannedType {
 					}
 				}
 
-				result = append(result, RawScannedType{
+				result = append(result, ScannedType{
 					Name:         d.Name,
 					Kind:         fmt.Sprintf("map[%s]%s", item.Type.(*ast.MapType).Key.(*ast.Ident).Name, item.Type.(*ast.MapType).Value.(*ast.Ident).Name),
 					Value:        cleanMap,
