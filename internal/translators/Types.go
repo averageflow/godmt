@@ -3,9 +3,10 @@ package translators
 import "github.com/averageflow/goschemaconverter/internal/syntaxtree"
 
 const (
-	JSONTranslationMode = "json"
+	JSONTranslationMode       = "json"
 	TypeScriptTranslationMode = "typescript"
-	TSTranslationMode = "ts"
+	TSTranslationMode         = "ts"
+	XMLTranslationMode        = "xml"
 )
 
 type TypeTranslator interface {

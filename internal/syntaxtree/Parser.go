@@ -99,6 +99,7 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 		case *ast.BasicLit:
 			item := values[i].(*ast.BasicLit)
 			itemType := fmt.Sprintf("%T", item.Value)
+
 			if item.Kind == token.INT {
 				itemType = "int64"
 			} else if item.Kind == token.FLOAT {
@@ -147,7 +148,7 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 			switch item.Type.(type) {
 			case *ast.MapType:
 				mapElements := reflect.ValueOf(item.Elts).Interface().([]ast.Expr)
-				cleanMap := make(map[string]interface{})
+				cleanMap := make(map[string]string)
 
 				for j := range mapElements {
 					rawKey := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Key").Interface().(*ast.BasicLit)

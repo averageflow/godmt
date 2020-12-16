@@ -17,6 +17,7 @@ func WalkSyntaxTree(f *ast.File) {
 
 var ScanResult []ScannedType
 var StructScanResult []ScannedStruct
+var TotalFileCount int
 
 // Visit represents the actions to be performed on every node of the tree
 // n represents the node, whose type can be obtained with fmt.Sprintf and %T
@@ -47,22 +48,33 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 				ScanResult = append(ScanResult, result[i])
 			}
 		}
-
-		break
 	}
 
 	return v + 1
+}
+
+func GetFileCount(path string, info os.FileInfo, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if info.IsDir() {
+		return nil
+	}
+
+	TotalFileCount += 1
+
+	return nil
 }
 
 func ScanDir(path string, info os.FileInfo, err error) error {
 	if err != nil {
 		return err
 	}
+
 	if info.IsDir() {
 		return nil
 	}
-
-	fmt.Printf("Scanning file: %s\n", path)
 
 	fset := token.NewFileSet()
 
