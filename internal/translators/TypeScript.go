@@ -112,7 +112,7 @@ Performing TypeScript translation!
 
 			if t.scannedStructs[i].Fields[j].ImportDetails != nil {
 				imports += fmt.Sprintf(
-					"import { %s } from %s;\n",
+					"import { %s } from \"%s\";\n",
 					t.scannedStructs[i].Fields[j].ImportDetails.EntityName,
 					t.scannedStructs[i].Fields[j].ImportDetails.PackageName,
 				)
