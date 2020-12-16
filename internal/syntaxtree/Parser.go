@@ -147,12 +147,13 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 				})
 			case *ast.ArrayType:
 				sliceType := getMapValueType(item.Type.(*ast.ArrayType).Elt)
+				rawDecl := reflect.ValueOf(d.Obj.Decl).Elem().Interface().(ast.ValueSpec)
 
 				result = append(result, ScannedType{
 					Name:         d.Name,
 					Kind:         fmt.Sprintf("[]%s", sliceType),
 					Value:        extractSliceValues(item.Elts),
-					Doc:          nil,
+					Doc:          extractComments(rawDecl.Doc),
 					InternalType: SliceType,
 				})
 			}

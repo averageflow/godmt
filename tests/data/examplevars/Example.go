@@ -41,6 +41,7 @@ var (
 		1,
 		2,
 	}
+	// InterfaceSlice is an interfaceSlice
 	InterfaceSlice = []interface{}{
 		"test",
 		"test2",
