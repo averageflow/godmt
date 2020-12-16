@@ -2,6 +2,7 @@ package translators
 
 import (
 	"fmt"
+
 	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
 )
 
@@ -21,17 +22,23 @@ func (t *TypeScriptTranslator) Translate() string {
 	var result string
 
 	for i := range t.scannedTypes {
+		if len(t.scannedTypes[i].Doc) > 0 {
+			for j := range t.scannedTypes[i].Doc {
+				result += fmt.Sprintf("%s\n", t.scannedTypes[i].Doc[j])
+			}
+		}
 		if t.scannedTypes[i].InternalType == syntaxtree.ConstType {
 			result += fmt.Sprintf("export const %s = %s;\n", t.scannedTypes[i].Name, t.scannedTypes[i].Value)
 		}
 	}
 
 	for i := range t.scannedStructs {
-		result += fmt.Sprintf("export interface %s  {\n", t.scannedStructs[i].Name)
+		result += fmt.Sprintf("\nexport interface %s  {\n", t.scannedStructs[i].Name)
 		for j := range t.scannedStructs[i].Fields {
-			result += fmt.Sprintf("%s: %s;\n", CleanTagName(t.scannedStructs[i].Fields[j].Tag), t.scannedStructs[i].Fields[j].Kind)
+			result += fmt.Sprintf("\t%s: %s;\n", CleanTagName(t.scannedStructs[i].Fields[j].Tag), t.scannedStructs[i].Fields[j].Kind)
 		}
-		result += "}"
+
+		result += "}\n"
 	}
 
 	fmt.Printf("%s", result)

@@ -3,6 +3,7 @@ package translators
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
 )
 
@@ -24,7 +25,6 @@ func (t *JSONTranslator) Setup(d []syntaxtree.ScannedType, s []syntaxtree.Scanne
 func (t *JSONTranslator) Translate() string {
 	fmt.Println("-----------------\nPerforming JSON translation!\n-----------------")
 
-
 	result, err := json.Marshal(finalResult{
 		Enums: t.scannedTypes,
 		Types: t.scannedStructs,
@@ -34,5 +34,6 @@ func (t *JSONTranslator) Translate() string {
 	}
 
 	fmt.Printf("%s", result)
+
 	return string(result)
 }

@@ -1,7 +1,16 @@
 package translators
 
-import "strings"
+import (
+	"strings"
+)
 
 func CleanTagName(rawTagName string) string {
-	return strings.ReplaceAll(rawTagName, `json:"`, ``)
+	var result string
+
+	result = strings.ReplaceAll(rawTagName, ",string", "")
+	result = strings.ReplaceAll(result, "`json:\"", "")
+	result = strings.ReplaceAll(result, ",omitempty", "")
+	result = strings.ReplaceAll(result, "\"`", "")
+	result = strings.ReplaceAll(result, `binding:"required"`, ``)
+	return strings.TrimSpace(result)
 }

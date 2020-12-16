@@ -50,6 +50,7 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 
 		break
 	}
+
 	return v + 1
 }
 
@@ -64,11 +65,13 @@ func ScanDir(path string, info os.FileInfo, err error) error {
 	fmt.Printf("Scanning file: %s\n", path)
 
 	fset := token.NewFileSet()
+
 	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	WalkSyntaxTree(f)
+
 	return nil
 }

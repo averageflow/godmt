@@ -2,12 +2,12 @@ package main
 
 import (
 	"flag"
-	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
-	"github.com/averageflow/goschemaconverter/internal/translators"
 	"log"
 	"path/filepath"
-)
 
+	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
+	"github.com/averageflow/goschemaconverter/internal/translators"
+)
 
 func main() {
 	scanPath := flag.String("dir", ".", "directory to scan")
@@ -25,12 +25,10 @@ func main() {
 		j := translators.JSONTranslator{}
 		j.Setup(syntaxtree.ScanResult, syntaxtree.StructScanResult)
 		j.Translate()
-		break
 	case translators.TypeScriptTranslationMode:
 	case translators.TSTranslationMode:
 		ts := translators.TypeScriptTranslator{}
 		ts.Setup(syntaxtree.ScanResult, syntaxtree.StructScanResult)
 		ts.Translate()
-		break
 	}
 }

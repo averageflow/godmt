@@ -24,6 +24,7 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 		switch fieldList[i].Type.(type) {
 		case *ast.Ident:
 			fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Name")
+
 			rawScannedFields = append(rawScannedFields, ScannedStructField{
 				Doc:  nil,
 				Name: fieldList[i].Names[0].Name,
@@ -125,7 +126,6 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 			item := values[i].(*ast.CompositeLit)
 			switch item.Type.(type) {
 			case *ast.MapType:
-
 				mapElements := reflect.ValueOf(item.Elts).Interface().([]ast.Expr)
 				cleanMap := make(map[string]interface{})
 
@@ -145,8 +145,12 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 				}
 
 				result = append(result, ScannedType{
-					Name:         d.Name,
-					Kind:         fmt.Sprintf("map[%s]%s", item.Type.(*ast.MapType).Key.(*ast.Ident).Name, item.Type.(*ast.MapType).Value.(*ast.Ident).Name),
+					Name: d.Name,
+					Kind: fmt.Sprintf(
+						"map[%s]%s",
+						item.Type.(*ast.MapType).Key.(*ast.Ident).Name,
+						item.Type.(*ast.MapType).Value.(*ast.Ident).Name,
+					),
 					Value:        cleanMap,
 					InternalType: MapType,
 					Doc:          doc,
