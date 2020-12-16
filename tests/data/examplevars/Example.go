@@ -31,3 +31,18 @@ var (
 	//TrueConstant is true
 	TrueVar = true
 )
+
+var (
+	StringSlice = []string{
+		"test",
+		"test2",
+	}
+	NumberSlice = []int{
+		1,
+		2,
+	}
+	InterfaceSlice = []interface{}{
+		"test",
+		"test2",
+	}
+)

@@ -54,23 +54,6 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 		case *ast.StructType:
 			fmt.Println("TODO: Support nested structs!")
 			break
-			/*fmt.Printf("%+v", fieldList[i])
-			item := fieldList[i].Type.(*ast.StructType)
-			itemFields := item.Fields.List
-
-			var subStruct *ScannedStruct
-
-			if len(itemFields) > 0 {
-
-			}
-
-			rawScannedFields = append(rawScannedFields, ScannedStructField{
-				Name:      fieldList[i].Names[0].Name,
-				Kind:      "struct",
-				Tag:       fieldList[i].Tag.Value,
-				Doc:       nil,
-				SubStruct: subStruct,
-			})*/
 		}
 	}
 
@@ -162,6 +145,16 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 					InternalType: MapType,
 					Doc:          doc,
 				})
+			case *ast.ArrayType:
+				sliceType := getMapValueType(item.Type.(*ast.ArrayType).Elt)
+
+				result = append(result, ScannedType{
+					Name:         d.Name,
+					Kind:         fmt.Sprintf("[]%s", sliceType),
+					Value:        extractSliceValues(item.Elts),
+					Doc:          nil,
+					InternalType: SliceType,
+				})
 			}
 		}
 	}
@@ -190,4 +183,12 @@ func getMapValueType(item ast.Expr) string {
 	default:
 		return "interface{}"
 	}
+}
+
+func extractSliceValues(items []ast.Expr) []string {
+	var result []string
+	for i := range items {
+		result = append(result, items[i].(*ast.BasicLit).Value)
+	}
+	return result
 }

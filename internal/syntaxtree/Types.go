@@ -5,6 +5,7 @@ const (
 	VarType    = 2
 	ConstType  = 3
 	StructType = 4
+	SliceType  = 5
 )
 
 type ScannedType struct {

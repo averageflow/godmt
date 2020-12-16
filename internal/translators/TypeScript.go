@@ -47,14 +47,15 @@ Performing TypeScript translation!
 			}
 		}
 
-		if t.scannedTypes[i].InternalType == syntaxtree.ConstType {
+		switch t.scannedTypes[i].InternalType {
+		case syntaxtree.ConstType:
 			result += fmt.Sprintf(
 				"export const %s: %s = %s;\n\n",
 				t.scannedTypes[i].Name,
 				getTypescriptCompatibleType(t.scannedTypes[i].Kind),
 				t.scannedTypes[i].Value,
 			)
-		} else if t.scannedTypes[i].InternalType == syntaxtree.MapType {
+		case syntaxtree.MapType:
 			result += fmt.Sprintf(
 				"export const %s: %s = {\n",
 				t.scannedTypes[i].Name,
@@ -62,7 +63,17 @@ Performing TypeScript translation!
 			)
 			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(t.scannedTypes[i].Value.(map[string]string)))
 			result += fmt.Sprint("};\n\n")
+		case syntaxtree.SliceType:
+			result += fmt.Sprintf(
+				"export const %s: %s = [\n",
+				t.scannedTypes[i].Name,
+				transformSliceTypeToTypeScript(t.scannedTypes[i].Kind),
+			)
+			result += fmt.Sprintf("%s\n", sliceValuesToTypeScript(t.scannedTypes[i].Value.([]string)))
+
+			result += fmt.Sprint("];\n\n")
 		}
+
 	}
 
 	for i := range t.scannedStructs {
@@ -140,4 +151,21 @@ func mapValuesToTypeScriptRecord(rawMap map[string]string) string {
 	}
 
 	return strings.Join(entries, ",\n")
+}
+
+func transformSliceTypeToTypeScript(rawSliceType string) string {
+	var result string
+
+	result = strings.ReplaceAll(rawSliceType, "[]", "")
+	return fmt.Sprintf("%s[]", getTypescriptCompatibleType(result))
+}
+
+func sliceValuesToTypeScript(raw []string) string {
+	var result []string
+
+	for i := range raw {
+		result = append(result, fmt.Sprintf("\t%s", raw[i]))
+	}
+
+	return strings.Join(result, ",\n")
 }
