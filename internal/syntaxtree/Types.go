@@ -15,13 +15,17 @@ type ScannedType struct {
 	Doc          []string    `json:"doc"`
 	InternalType int         `json:"internalType"`
 }
+type ImportedEntityDetails struct {
+	EntityName  string
+	PackageName string
+}
 
 type ScannedStructField struct {
-	Name string   `json:"name"`
-	Kind string   `json:"kind"`
-	Tag  string   `json:"tag"`
-	Doc  []string `json:"doc"`
-	//SubStruct *ScannedStruct `json:"subStruct"`
+	Name          string                 `json:"name"`
+	Kind          string                 `json:"kind"`
+	Tag           string                 `json:"tag"`
+	Doc           []string               `json:"doc"`
+	ImportDetails *ImportedEntityDetails `json:"imported_entity"`
 }
 
 type ScannedStruct struct {

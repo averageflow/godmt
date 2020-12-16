@@ -38,6 +38,7 @@ Performing TypeScript translation!
 ----------------------------------
 	`)
 
+	var imports string
 	var result string
 
 	for i := range t.scannedTypes {
@@ -108,9 +109,21 @@ Performing TypeScript translation!
 			}
 
 			result += fmt.Sprintf("\t%s: %s;\n", tag, getTypescriptCompatibleType(t.scannedStructs[i].Fields[j].Kind))
+
+			if t.scannedStructs[i].Fields[j].ImportDetails != nil {
+				imports += fmt.Sprintf(
+					"import { %s } from %s;\n",
+					t.scannedStructs[i].Fields[j].ImportDetails.EntityName,
+					t.scannedStructs[i].Fields[j].ImportDetails.PackageName,
+				)
+			}
 		}
 
 		result += "}\n"
+	}
+
+	if imports != "" {
+		return fmt.Sprintf("%s\n\n%s", imports, result)
 	}
 
 	return result

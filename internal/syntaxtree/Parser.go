@@ -27,11 +27,18 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 			if fieldList[i].Names != nil {
 				fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Name")
 
+				tag := fieldList[i].Tag
+
+				var tagValue string
+				if tag != nil {
+					tagValue = tag.Value
+				}
+
 				rawScannedFields = append(rawScannedFields, ScannedStructField{
 					Doc:  extractComments(fieldList[i].Doc),
 					Name: fieldList[i].Names[0].Name,
 					Kind: fieldType.Interface().(string),
-					Tag:  fieldList[i].Tag.Value,
+					Tag:  tagValue,
 				})
 			} else {
 				// Struct inside a struct
@@ -54,6 +61,28 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 		case *ast.StructType:
 			fmt.Println("TODO: Support nested structs!")
 			break
+		case *ast.SelectorExpr:
+			// imported entity
+			fieldType := reflect.ValueOf(fieldList[i].Type).Interface().(*ast.SelectorExpr)
+
+			tag := fieldList[i].Tag
+
+			var tagValue string
+			if tag != nil {
+				tagValue = tag.Value
+			}
+
+			packageName := fmt.Sprintf("%s", reflect.ValueOf(fieldType.X).Elem().FieldByName("Name"))
+			rawScannedFields = append(rawScannedFields, ScannedStructField{
+				Doc:  nil,
+				Name: fieldList[i].Names[0].Name,
+				Kind: fieldType.Sel.Name,
+				Tag:  tagValue,
+				ImportDetails: &ImportedEntityDetails{
+					EntityName:  fieldType.Sel.Name,
+					PackageName: packageName,
+				},
+			})
 		}
 	}
 
