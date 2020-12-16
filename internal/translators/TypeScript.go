@@ -7,11 +7,13 @@ import (
 )
 
 type TypeScriptTranslator struct {
+	preserve       bool
 	scannedTypes   []syntaxtree.ScannedType
 	scannedStructs []syntaxtree.ScannedStruct
 }
 
-func (t *TypeScriptTranslator) Setup(d []syntaxtree.ScannedType, s []syntaxtree.ScannedStruct) {
+func (t *TypeScriptTranslator) Setup(preserve bool, d []syntaxtree.ScannedType, s []syntaxtree.ScannedStruct) {
+	t.preserve = preserve
 	t.scannedTypes = d
 	t.scannedStructs = s
 }
@@ -28,14 +30,19 @@ func (t *TypeScriptTranslator) Translate() string {
 			}
 		}
 		if t.scannedTypes[i].InternalType == syntaxtree.ConstType {
-			result += fmt.Sprintf("export const %s = %s;\n", t.scannedTypes[i].Name, t.scannedTypes[i].Value)
+			result += fmt.Sprintf("export const %s = %s;\n\n", t.scannedTypes[i].Name, t.scannedTypes[i].Value)
 		}
 	}
 
 	for i := range t.scannedStructs {
-		result += fmt.Sprintf("\nexport interface %s  {\n", t.scannedStructs[i].Name)
+		result += fmt.Sprintf("\nexport interface %s {\n", t.scannedStructs[i].Name)
 		for j := range t.scannedStructs[i].Fields {
-			result += fmt.Sprintf("\t%s: %s;\n", CleanTagName(t.scannedStructs[i].Fields[j].Tag), t.scannedStructs[i].Fields[j].Kind)
+			tag := CleanTagName(t.scannedStructs[i].Fields[j].Tag)
+			if tag == "" || t.preserve {
+				tag = t.scannedStructs[i].Fields[j].Name
+			}
+
+			result += fmt.Sprintf("\t%s: %s;\n", tag, t.scannedStructs[i].Fields[j].Kind)
 		}
 
 		result += "}\n"

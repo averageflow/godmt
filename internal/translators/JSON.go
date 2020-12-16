@@ -13,11 +13,13 @@ type finalResult struct {
 }
 
 type JSONTranslator struct {
+	preserve       bool
 	scannedTypes   []syntaxtree.ScannedType
 	scannedStructs []syntaxtree.ScannedStruct
 }
 
-func (t *JSONTranslator) Setup(d []syntaxtree.ScannedType, s []syntaxtree.ScannedStruct) {
+func (t *JSONTranslator) Setup(preserve bool, d []syntaxtree.ScannedType, s []syntaxtree.ScannedStruct) {
+	t.preserve = preserve
 	t.scannedTypes = d
 	t.scannedStructs = s
 }

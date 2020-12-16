@@ -23,14 +23,34 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 	for i := range fieldList {
 		switch fieldList[i].Type.(type) {
 		case *ast.Ident:
-			fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Name")
+			// Basic type of a field inside a struct
+			if fieldList[i].Names != nil {
+				fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Name")
 
-			rawScannedFields = append(rawScannedFields, ScannedStructField{
-				Doc:  nil,
-				Name: fieldList[i].Names[0].Name,
-				Kind: fieldType.Interface().(string),
-				Tag:  fieldList[i].Tag.Value,
-			})
+				rawScannedFields = append(rawScannedFields, ScannedStructField{
+					Doc:  nil,
+					Name: fieldList[i].Names[0].Name,
+					Kind: fieldType.Interface().(string),
+					Tag:  fieldList[i].Tag.Value,
+				})
+			} else {
+				// Struct inside a struct
+				fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Obj").Interface().(*ast.Object)
+				tag := fieldList[i].Tag
+
+				var tagValue string
+				if tag != nil {
+					tagValue = tag.Value
+				}
+
+				rawScannedFields = append(rawScannedFields, ScannedStructField{
+					Doc:  nil,
+					Name: fieldType.Name,
+					Kind: "struct",
+					Tag:  tagValue,
+				})
+			}
+
 		case *ast.StructType:
 			fmt.Println("TODO: Support nested structs!")
 			break

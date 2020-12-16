@@ -12,6 +12,7 @@ import (
 func main() {
 	scanPath := flag.String("dir", ".", "directory to scan")
 	translateMode := flag.String("translation", "json", "translation mode")
+	preserveNames := flag.Bool("preserve", false, "should preserve the original struct field names")
 
 	flag.Parse()
 
@@ -23,12 +24,12 @@ func main() {
 	switch *translateMode {
 	case translators.JSONTranslationMode:
 		j := translators.JSONTranslator{}
-		j.Setup(syntaxtree.ScanResult, syntaxtree.StructScanResult)
+		j.Setup(*preserveNames, syntaxtree.ScanResult, syntaxtree.StructScanResult)
 		j.Translate()
 	case translators.TypeScriptTranslationMode:
 	case translators.TSTranslationMode:
 		ts := translators.TypeScriptTranslator{}
-		ts.Setup(syntaxtree.ScanResult, syntaxtree.StructScanResult)
+		ts.Setup(*preserveNames, syntaxtree.ScanResult, syntaxtree.StructScanResult)
 		ts.Translate()
 	}
 }
