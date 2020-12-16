@@ -15,17 +15,17 @@ var goTypeScriptTypeMappings = map[string]string{
 	"float32":     "number",
 	"float64":     "number",
 	"string":      "string",
-	"bool":        "bool",
+	"bool":        "boolean",
 	"interface{}": "any",
 }
 
 type TypeScriptTranslator struct {
 	preserve       bool
-	scannedTypes   []syntaxtree.ScannedType
-	scannedStructs []syntaxtree.ScannedStruct
+	scannedTypes   map[string]syntaxtree.ScannedType
+	scannedStructs map[string]syntaxtree.ScannedStruct
 }
 
-func (t *TypeScriptTranslator) Setup(preserve bool, d []syntaxtree.ScannedType, s []syntaxtree.ScannedStruct) {
+func (t *TypeScriptTranslator) Setup(preserve bool, d map[string]syntaxtree.ScannedType, s map[string]syntaxtree.ScannedStruct) {
 	t.preserve = preserve
 	t.scannedTypes = d
 	t.scannedStructs = s
@@ -48,7 +48,20 @@ Performing TypeScript translation!
 		}
 
 		if t.scannedTypes[i].InternalType == syntaxtree.ConstType {
-			result += fmt.Sprintf("export const %s = %s;\n\n", t.scannedTypes[i].Name, t.scannedTypes[i].Value)
+			result += fmt.Sprintf(
+				"export const %s: %s = %s;\n\n",
+				t.scannedTypes[i].Name,
+				getTypescriptCompatibleType(t.scannedTypes[i].Kind),
+				t.scannedTypes[i].Value,
+			)
+		} else if t.scannedTypes[i].InternalType == syntaxtree.MapType {
+			result += fmt.Sprintf(
+				"export const %s: %s = {\n",
+				t.scannedTypes[i].Name,
+				getRecordType(t.scannedTypes[i].Kind),
+			)
+			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(t.scannedTypes[i].Value.(map[string]string)))
+			result += fmt.Sprint("};\n\n")
 		}
 	}
 
@@ -77,13 +90,17 @@ Performing TypeScript translation!
 				tag = t.scannedStructs[i].Fields[j].Name
 			}
 
+			if t.scannedStructs[i].Fields[j].Doc != nil {
+				for k := range t.scannedStructs[i].Fields[j].Doc {
+					result += fmt.Sprintf("\t%s\n", t.scannedStructs[i].Fields[j].Doc[k])
+				}
+			}
+
 			result += fmt.Sprintf("\t%s: %s;\n", tag, getTypescriptCompatibleType(t.scannedStructs[i].Fields[j].Kind))
 		}
 
 		result += "}\n"
 	}
-
-	//fmt.Printf("%s", result)
 
 	return result
 }
@@ -99,4 +116,28 @@ func getTypescriptCompatibleType(goType string) string {
 	}
 
 	return result
+}
+
+func getRecordType(goMapType string) string {
+	var result string
+
+	result = strings.ReplaceAll(goMapType, "map[", "")
+	recordTypes := strings.Split(result, "]")
+
+	for i := range recordTypes {
+		recordTypes[i] = getTypescriptCompatibleType(recordTypes[i])
+	}
+
+	result = strings.Join(recordTypes, ", ")
+
+	return fmt.Sprintf("Record<%s>", result)
+}
+
+func mapValuesToTypeScriptRecord(rawMap map[string]string) string {
+	var entries []string
+	for i := range rawMap {
+		entries = append(entries, fmt.Sprintf("\t%s: %s", i, rawMap[i]))
+	}
+
+	return strings.Join(entries, ",\n")
 }

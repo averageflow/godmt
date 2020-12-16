@@ -18,6 +18,9 @@ func main() {
 
 	flag.Parse()
 
+	syntaxtree.ScanResult = make(map[string]syntaxtree.ScannedType)
+	syntaxtree.StructScanResult = make(map[string]syntaxtree.ScannedStruct)
+
 	err := filepath.Walk(*scanPath, syntaxtree.GetFileCount)
 	if err != nil {
 		log.Println(err)
@@ -41,11 +44,6 @@ func main() {
 		ts := translators.TypeScriptTranslator{}
 		ts.Setup(*preserveNames, syntaxtree.ScanResult, syntaxtree.StructScanResult)
 		resultingOutput = ts.Translate()
-	case translators.XMLTranslationMode:
-		filename = "result.xml"
-		x := translators.XMLTranslator{}
-		x.Setup(*preserveNames, syntaxtree.ScanResult, syntaxtree.StructScanResult)
-		resultingOutput = x.Translate()
 	default:
 		filename = "result.json"
 		j := translators.JSONTranslator{}

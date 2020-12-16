@@ -8,17 +8,17 @@ import (
 )
 
 type jsonFinalResult struct {
-	Enums []syntaxtree.ScannedType   `json:"enums"`
-	Types []syntaxtree.ScannedStruct `json:"types"`
+	Enums map[string]syntaxtree.ScannedType   `json:"enums"`
+	Types map[string]syntaxtree.ScannedStruct `json:"types"`
 }
 
 type JSONTranslator struct {
 	preserve       bool
-	scannedTypes   []syntaxtree.ScannedType
-	scannedStructs []syntaxtree.ScannedStruct
+	scannedTypes   map[string]syntaxtree.ScannedType
+	scannedStructs map[string]syntaxtree.ScannedStruct
 }
 
-func (t *JSONTranslator) Setup(preserve bool, d []syntaxtree.ScannedType, s []syntaxtree.ScannedStruct) {
+func (t *JSONTranslator) Setup(preserve bool, d map[string]syntaxtree.ScannedType, s map[string]syntaxtree.ScannedStruct) {
 	t.preserve = preserve
 	t.scannedTypes = d
 	t.scannedStructs = s

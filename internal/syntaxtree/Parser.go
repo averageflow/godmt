@@ -28,7 +28,7 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 				fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Name")
 
 				rawScannedFields = append(rawScannedFields, ScannedStructField{
-					Doc:  nil,
+					Doc:  extractComments(fieldList[i].Doc),
 					Name: fieldList[i].Names[0].Name,
 					Kind: fieldType.Interface().(string),
 					Tag:  fieldList[i].Tag.Value,
@@ -106,40 +106,26 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 				itemType = "float64"
 			}
 
-			var doc []string
-
 			rawDecl := reflect.ValueOf(d.Obj.Decl).Elem().Interface().(ast.ValueSpec)
-			if rawDecl.Doc != nil {
-				for i := range rawDecl.Doc.List {
-					doc = append(doc, rawDecl.Doc.List[i].Text)
-				}
-			}
 
 			result = append(result, ScannedType{
 				Name:         d.Name,
 				Kind:         itemType,
 				Value:        item.Value,
-				Doc:          doc,
+				Doc:          extractComments(rawDecl.Doc),
 				InternalType: ConstType,
 			})
 		case *ast.Ident:
 			item := values[i].(*ast.Ident)
 
-			var doc []string
-
 			rawDecl := reflect.ValueOf(d.Obj.Decl).Elem().Interface().(ast.ValueSpec)
-			if rawDecl.Doc != nil {
-				for i := range rawDecl.Doc.List {
-					doc = append(doc, rawDecl.Doc.List[i].Text)
-				}
-			}
 
 			if item.Name == "true" || item.Name == "false" {
 				result = append(result, ScannedType{
 					Name:         d.Name,
 					Kind:         "bool",
 					Value:        item.Name,
-					Doc:          doc,
+					Doc:          extractComments(rawDecl.Doc),
 					InternalType: ConstType,
 				})
 			}
@@ -178,6 +164,20 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 				})
 			}
 		}
+	}
+
+	return result
+}
+
+func extractComments(rawCommentGroup *ast.CommentGroup) []string {
+	var result []string
+	if rawCommentGroup == nil {
+		return result
+	}
+
+	commentList := rawCommentGroup.List
+	for i := range commentList {
+		result = append(result, commentList[i].Text)
 	}
 
 	return result

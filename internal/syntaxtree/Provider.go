@@ -1,7 +1,6 @@
 package syntaxtree
 
 import (
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -15,8 +14,8 @@ func WalkSyntaxTree(f *ast.File) {
 	ast.Walk(v, f)
 }
 
-var ScanResult []ScannedType
-var StructScanResult []ScannedStruct
+var ScanResult map[string]ScannedType
+var StructScanResult map[string]ScannedStruct
 var TotalFileCount int
 
 // Visit represents the actions to be performed on every node of the tree
@@ -33,19 +32,22 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 		}
 
 		if d.Obj.Kind == ast.Typ {
-			fmt.Printf("type: %T, value: %+v\n", d.Obj, d.Obj)
 			result := parseStruct(d)
 
 			for i := range result {
-				StructScanResult = append(StructScanResult, result[i])
+				_, ok := StructScanResult[result[i].Name]
+				if !ok {
+					StructScanResult[result[i].Name] = result[i]
+				}
 			}
-		}
-
-		if d.Obj.Kind == ast.Con || d.Obj.Kind == ast.Var {
+		} else if d.Obj.Kind == ast.Con || d.Obj.Kind == ast.Var {
 			result := parseConstantsAndVariables(d)
 
 			for i := range result {
-				ScanResult = append(ScanResult, result[i])
+				_, ok := ScanResult[result[i].Name]
+				if !ok {
+					ScanResult[result[i].Name] = result[i]
+				}
 			}
 		}
 	}
