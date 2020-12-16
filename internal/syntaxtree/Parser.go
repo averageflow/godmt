@@ -155,8 +155,8 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 					Name: d.Name,
 					Kind: fmt.Sprintf(
 						"map[%s]%s",
-						item.Type.(*ast.MapType).Key.(*ast.Ident).Name,
-						item.Type.(*ast.MapType).Value.(*ast.Ident).Name,
+						getMapValueType(item.Type.(*ast.MapType).Key),
+						getMapValueType(item.Type.(*ast.MapType).Value),
 					),
 					Value:        cleanMap,
 					InternalType: MapType,
@@ -181,4 +181,13 @@ func extractComments(rawCommentGroup *ast.CommentGroup) []string {
 	}
 
 	return result
+}
+
+func getMapValueType(item ast.Expr) string {
+	switch item.(type) {
+	case *ast.Ident:
+		return item.(*ast.Ident).Name
+	default:
+		return "interface{}"
+	}
 }

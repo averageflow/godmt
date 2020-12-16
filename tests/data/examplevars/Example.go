@@ -20,6 +20,11 @@ var (
 		"test2": 2,
 		"test3": 3,
 	}
+	MapTestInterfaceVar = map[string]interface{}{
+		"test":  1,
+		"test2": "",
+		"test3": 1.234,
+	}
 )
 
 var (
