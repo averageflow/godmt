@@ -13,15 +13,13 @@ type jsonFinalResult struct {
 }
 
 type JSONTranslator struct {
-	preserve       bool
-	scannedTypes   map[string]syntaxtree.ScannedType
-	scannedStructs map[string]syntaxtree.ScannedStruct
+	Translator
 }
 
 func (t *JSONTranslator) Setup(preserve bool, d map[string]syntaxtree.ScannedType, s map[string]syntaxtree.ScannedStruct) {
-	t.preserve = preserve
-	t.scannedTypes = d
-	t.scannedStructs = s
+	t.Preserve = preserve
+	t.ScannedTypes = d
+	t.ScannedStructs = s
 }
 
 func (t *JSONTranslator) Translate() string {
@@ -32,8 +30,8 @@ Performing JSON translation!
 	`)
 
 	payload := jsonFinalResult{
-		Enums: t.scannedTypes,
-		Types: t.scannedStructs,
+		Enums: t.ScannedTypes,
+		Types: t.ScannedStructs,
 	}
 
 	result, err := json.MarshalIndent(payload, "", "\t")

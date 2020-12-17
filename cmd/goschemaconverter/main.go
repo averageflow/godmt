@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
 	"github.com/averageflow/goschemaconverter/internal/translators"
@@ -39,26 +40,55 @@ func main() {
 		os.Exit(0)
 	}
 
+	constantsOrderSlice := make([]string, len(syntaxtree.ScanResult))
+	structsOrderSlice := make([]string, len(syntaxtree.StructScanResult))
+
+	i := 0
+	for k := range syntaxtree.ScanResult {
+		constantsOrderSlice[i] = k
+		i++
+	}
+
+	i = 0
+	for k := range syntaxtree.StructScanResult {
+		structsOrderSlice[i] = k
+		i++
+	}
+
+	sort.Strings(constantsOrderSlice)
+	sort.Strings(structsOrderSlice)
+
 	var resultingOutput string
 	var filename string
+
+	baseTranslator := translators.Translator{
+		Preserve:       *preserveNames,
+		OrderedTypes:   constantsOrderSlice,
+		ScannedTypes:   syntaxtree.ScanResult,
+		OrderedStructs: structsOrderSlice,
+		ScannedStructs: syntaxtree.StructScanResult,
+	}
 
 	switch *translateMode {
 
 	case translators.TypeScriptTranslationMode:
 	case translators.TSTranslationMode:
 		filename = "result.ts"
-		ts := translators.TypeScriptTranslator{}
-		ts.Setup(*preserveNames, syntaxtree.ScanResult, syntaxtree.StructScanResult)
+		ts := translators.TypeScriptTranslator{
+			Translator: baseTranslator,
+		}
 		resultingOutput = ts.Translate()
 	case translators.SwiftTranslationMode:
 		filename = "result.swift"
-		s := translators.SwiftTranslator{}
-		s.Setup(*preserveNames, syntaxtree.ScanResult, syntaxtree.StructScanResult)
+		s := translators.SwiftTranslator{
+			Translator: baseTranslator,
+		}
 		resultingOutput = s.Translate()
 	default:
 		filename = "result.json"
-		j := translators.JSONTranslator{}
-		j.Setup(*preserveNames, syntaxtree.ScanResult, syntaxtree.StructScanResult)
+		j := translators.JSONTranslator{
+			Translator: baseTranslator,
+		}
 		resultingOutput = j.Translate()
 	}
 
