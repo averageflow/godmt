@@ -34,4 +34,4 @@ Feel free to browse some [examples that I am happy to provide here](examples/Con
 
 ## Building
 
-To build this application as a binary simply navigate to `cmd/goschemaconverter` and run `go build main.go`.
+To build this application as a binary simply navigate to `cmd/goschemaconverter` and run `go build`.
