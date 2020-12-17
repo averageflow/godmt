@@ -44,6 +44,11 @@ func main() {
 		ts := translators.TypeScriptTranslator{}
 		ts.Setup(*preserveNames, syntaxtree.ScanResult, syntaxtree.StructScanResult)
 		resultingOutput = ts.Translate()
+	case translators.SwiftTranslationMode:
+		filename = "result.swift"
+		s := translators.SwiftTranslator{}
+		s.Setup(*preserveNames, syntaxtree.ScanResult, syntaxtree.StructScanResult)
+		resultingOutput = s.Translate()
 	default:
 		filename = "result.json"
 		j := translators.JSONTranslator{}
