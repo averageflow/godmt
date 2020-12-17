@@ -1,3 +1,4 @@
 .idea/
 .DS_Store
 cmd/goschemaconverter/result*.*
+cmd/goschemaconverter/goschemaconverter
