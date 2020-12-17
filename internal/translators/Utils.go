@@ -8,13 +8,22 @@ import (
 )
 
 func CleanTagName(rawTagName string) string {
-	var result string
+	replacePatterns := []string{
+		",string",
+		"`json:\"",
+		"\" binding:\"",
+		"`uri:\"",
+		",omitempty",
+		"\"`",
+		`binding:"required"`,
+	}
 
-	result = strings.ReplaceAll(rawTagName, ",string", "")
-	result = strings.ReplaceAll(result, "`json:\"", "")
-	result = strings.ReplaceAll(result, ",omitempty", "")
-	result = strings.ReplaceAll(result, "\"`", "")
-	result = strings.ReplaceAll(result, `binding:"required"`, ``)
+	result := rawTagName
+
+	for i := range replacePatterns {
+		result = strings.ReplaceAll(result, replacePatterns[i], "")
+	}
+
 	return strings.TrimSpace(result)
 }
 

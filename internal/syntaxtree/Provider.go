@@ -88,6 +88,10 @@ func ScanDir(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 
+	if !strings.Contains(info.Name(), ".go") {
+		return nil
+	}
+
 	fset := token.NewFileSet()
 
 	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)

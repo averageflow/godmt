@@ -15,17 +15,56 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 		return result
 	}
 
-	fields := structTypes.Interface().(*ast.StructType)
-	fieldList := fields.Fields.List
+	switch structTypes.Interface().(type) {
+	case *ast.StructType:
+		fields := structTypes.Interface().(*ast.StructType)
+		fieldList := fields.Fields.List
 
-	var rawScannedFields []ScannedStructField
+		var rawScannedFields []ScannedStructField
 
-	for i := range fieldList {
-		switch fieldList[i].Type.(type) {
-		case *ast.Ident:
-			// Basic type of a field inside a struct
-			if fieldList[i].Names != nil {
-				fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Name")
+		for i := range fieldList {
+			switch fieldList[i].Type.(type) {
+			case *ast.Ident:
+				// Basic type of a field inside a struct
+				if fieldList[i].Names != nil {
+					fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Name")
+
+					tag := fieldList[i].Tag
+
+					var tagValue string
+					if tag != nil {
+						tagValue = tag.Value
+					}
+
+					rawScannedFields = append(rawScannedFields, ScannedStructField{
+						Doc:  extractComments(fieldList[i].Doc),
+						Name: fieldList[i].Names[0].Name,
+						Kind: fieldType.Interface().(string),
+						Tag:  tagValue,
+					})
+				} else {
+					// Struct inside a struct
+					fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Obj").Interface().(*ast.Object)
+					tag := fieldList[i].Tag
+
+					var tagValue string
+					if tag != nil {
+						tagValue = tag.Value
+					}
+
+					rawScannedFields = append(rawScannedFields, ScannedStructField{
+						Doc:  nil,
+						Name: fieldType.Name,
+						Kind: "struct",
+						Tag:  tagValue,
+					})
+				}
+			case *ast.StructType:
+				fmt.Println("TODO: Support nested structs!")
+				break
+			case *ast.SelectorExpr:
+				// imported entity
+				fieldType := reflect.ValueOf(fieldList[i].Type).Interface().(*ast.SelectorExpr)
 
 				tag := fieldList[i].Tag
 
@@ -34,63 +73,26 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 					tagValue = tag.Value
 				}
 
-				rawScannedFields = append(rawScannedFields, ScannedStructField{
-					Doc:  extractComments(fieldList[i].Doc),
-					Name: fieldList[i].Names[0].Name,
-					Kind: fieldType.Interface().(string),
-					Tag:  tagValue,
-				})
-			} else {
-				// Struct inside a struct
-				fieldType := reflect.ValueOf(fieldList[i].Type).Elem().FieldByName("Obj").Interface().(*ast.Object)
-				tag := fieldList[i].Tag
-
-				var tagValue string
-				if tag != nil {
-					tagValue = tag.Value
-				}
-
+				packageName := fmt.Sprintf("%s", reflect.ValueOf(fieldType.X).Elem().FieldByName("Name"))
 				rawScannedFields = append(rawScannedFields, ScannedStructField{
 					Doc:  nil,
-					Name: fieldType.Name,
-					Kind: "struct",
+					Name: fieldList[i].Names[0].Name,
+					Kind: fieldType.Sel.Name,
 					Tag:  tagValue,
+					ImportDetails: &ImportedEntityDetails{
+						EntityName:  fieldType.Sel.Name,
+						PackageName: packageName,
+					},
 				})
 			}
-		case *ast.StructType:
-			fmt.Println("TODO: Support nested structs!")
-			break
-		case *ast.SelectorExpr:
-			// imported entity
-			fieldType := reflect.ValueOf(fieldList[i].Type).Interface().(*ast.SelectorExpr)
-
-			tag := fieldList[i].Tag
-
-			var tagValue string
-			if tag != nil {
-				tagValue = tag.Value
-			}
-
-			packageName := fmt.Sprintf("%s", reflect.ValueOf(fieldType.X).Elem().FieldByName("Name"))
-			rawScannedFields = append(rawScannedFields, ScannedStructField{
-				Doc:  nil,
-				Name: fieldList[i].Names[0].Name,
-				Kind: fieldType.Sel.Name,
-				Tag:  tagValue,
-				ImportDetails: &ImportedEntityDetails{
-					EntityName:  fieldType.Sel.Name,
-					PackageName: packageName,
-				},
-			})
 		}
+		result = append(result, ScannedStruct{
+			Doc:          nil,
+			Name:         d.Name,
+			Fields:       rawScannedFields,
+			InternalType: StructType,
+		})
 	}
-
-	result = append(result, ScannedStruct{
-		Doc:          nil,
-		Name:         d.Name,
-		Fields:       rawScannedFields,
-		InternalType: StructType,
-	})
 
 	return result
 }
@@ -148,9 +150,12 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 				cleanMap := make(map[string]string)
 
 				for j := range mapElements {
-					rawKey := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Key").Interface().(*ast.BasicLit)
-					rawValue := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Value").Interface().(*ast.BasicLit)
-					cleanMap[fmt.Sprintf("%v", rawKey.Value)] = rawValue.Value
+					rawKey := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Key")
+					switch rawKey.Interface().(type) {
+					case *ast.BasicLit:
+						rawValue := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Value").Interface().(*ast.BasicLit)
+						cleanMap[fmt.Sprintf("%v", rawKey.Interface().(*ast.BasicLit).Value)] = rawValue.Value
+					}
 				}
 
 				var doc []string
