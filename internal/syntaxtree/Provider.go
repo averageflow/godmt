@@ -1,11 +1,13 @@
 package syntaxtree
 
 import (
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"log"
 	"os"
+	"strings"
 )
 
 func WalkSyntaxTree(f *ast.File) {
@@ -17,6 +19,7 @@ func WalkSyntaxTree(f *ast.File) {
 var ScanResult map[string]ScannedType
 var StructScanResult map[string]ScannedStruct
 var TotalFileCount int
+var ShouldPrintAbstractSyntaxTree bool
 
 // Visit represents the actions to be performed on every node of the tree
 // n represents the node, whose type can be obtained with fmt.Sprintf and %T
@@ -24,6 +27,13 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 	if n == nil {
 		return nil
 	}
+
+	if ShouldPrintAbstractSyntaxTree {
+		fmt.Printf("%s%T\n", strings.Repeat("\t", int(v)), n)
+		fmt.Printf("%d", v)
+		return v + 1
+	}
+
 	switch d := n.(type) {
 
 	case *ast.Ident:

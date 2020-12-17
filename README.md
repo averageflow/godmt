@@ -18,6 +18,7 @@ go run main.go -dir={scanDirectory} -translation={language} -preserve
     - `ts` or `typescript` for TypeScript conversion
     - `swift` for Swift conversion
 - `preserve` is an optional boolean flag which will make the output structs preserve the original names, instead of using the (`json:"tag"`).
+- `tree` is an optional boolean that when present will prevent any file operations being performed, and instead will show you the full abstract syntax tree of your files in the standard output.
 
 Example usage:
 

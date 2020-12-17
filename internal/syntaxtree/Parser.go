@@ -57,7 +57,6 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 					Tag:  tagValue,
 				})
 			}
-
 		case *ast.StructType:
 			fmt.Println("TODO: Support nested structs!")
 			break

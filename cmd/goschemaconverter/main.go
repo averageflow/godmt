@@ -15,11 +15,12 @@ func main() {
 	scanPath := flag.String("dir", ".", "directory to scan")
 	translateMode := flag.String("translation", "json", "translation mode")
 	preserveNames := flag.Bool("preserve", false, "should preserve the original struct field names")
-
+	tree := flag.Bool("tree", false, "should show the abstract syntax tree")
 	flag.Parse()
 
 	syntaxtree.ScanResult = make(map[string]syntaxtree.ScannedType)
 	syntaxtree.StructScanResult = make(map[string]syntaxtree.ScannedStruct)
+	syntaxtree.ShouldPrintAbstractSyntaxTree = *tree
 
 	err := filepath.Walk(*scanPath, syntaxtree.GetFileCount)
 	if err != nil {
@@ -31,6 +32,11 @@ func main() {
 	err = filepath.Walk(*scanPath, syntaxtree.ScanDir)
 	if err != nil {
 		log.Println(err)
+	}
+
+	if syntaxtree.ShouldPrintAbstractSyntaxTree {
+		fmt.Printf("0 bytes written")
+		os.Exit(0)
 	}
 
 	var resultingOutput string
