@@ -32,12 +32,6 @@ After a successful run, the program will output a `result.*` file in the current
 
 Feel free to browse some [examples that I am happy to provide here](examples/Conversions.md).
 
-
-JSON:
-
-```json
-
-```
 ## Building
 
 To build this application as a binary simply navigate to `cmd/goschemaconverter` and run `go build main.go`.

@@ -303,3 +303,298 @@ struct TestOne: Decodable {
 }
 
 ```
+
+JSON: 
+
+```json
+{
+	"enums": {
+		"ExampleString": {
+			"name": "ExampleString",
+			"kind": "string",
+			"value": "\"example\"",
+			"doc": [
+				"// Comment Test ExampleString"
+			],
+			"internalType": 3
+		},
+		"ExampleStringVar": {
+			"name": "ExampleStringVar",
+			"kind": "string",
+			"value": "\"example\"",
+			"doc": [
+				"// ExampleString is a nice example"
+			],
+			"internalType": 3
+		},
+		"InterfaceSlice": {
+			"name": "InterfaceSlice",
+			"kind": "[]interface{}",
+			"value": [
+				"\"test\"",
+				"\"test2\""
+			],
+			"doc": [
+				"// InterfaceSlice is an interfaceSlice"
+			],
+			"internalType": 5
+		},
+		"MapTestIntVar": {
+			"name": "MapTestIntVar",
+			"kind": "map[string]int",
+			"value": {
+				"\"test\"": "1",
+				"\"test2\"": "2",
+				"\"test3\"": "3"
+			},
+			"doc": null,
+			"internalType": 1
+		},
+		"MapTestInterfaceVar": {
+			"name": "MapTestInterfaceVar",
+			"kind": "map[string]interface{}",
+			"value": {
+				"\"test\"": "1",
+				"\"test2\"": "\"\"",
+				"\"test3\"": "1.234"
+			},
+			"doc": null,
+			"internalType": 1
+		},
+		"MapTestVar": {
+			"name": "MapTestVar",
+			"kind": "map[string]string",
+			"value": {
+				"\"test\"": "\"example\"",
+				"\"test2\"": "\"example2\"",
+				"\"test3\"": "\"example3\""
+			},
+			"doc": [
+				"// This map also deserves a comment"
+			],
+			"internalType": 1
+		},
+		"NumberOne": {
+			"name": "NumberOne",
+			"kind": "int64",
+			"value": "1",
+			"doc": null,
+			"internalType": 3
+		},
+		"NumberOneVar": {
+			"name": "NumberOneVar",
+			"kind": "int64",
+			"value": "1",
+			"doc": [
+				"// NumberOne is a nice example",
+				"// that spans multiple comment lines"
+			],
+			"internalType": 3
+		},
+		"NumberSlice": {
+			"name": "NumberSlice",
+			"kind": "[]int",
+			"value": [
+				"1",
+				"2"
+			],
+			"doc": null,
+			"internalType": 5
+		},
+		"StringSlice": {
+			"name": "StringSlice",
+			"kind": "[]string",
+			"value": [
+				"\"test\"",
+				"\"test2\""
+			],
+			"doc": null,
+			"internalType": 5
+		},
+		"TrueConstant": {
+			"name": "TrueConstant",
+			"kind": "bool",
+			"value": "true",
+			"doc": [
+				"//TrueConstant is true"
+			],
+			"internalType": 3
+		},
+		"TrueVar": {
+			"name": "TrueVar",
+			"kind": "bool",
+			"value": "true",
+			"doc": [
+				"//TrueConstant is true"
+			],
+			"internalType": 3
+		}
+	},
+	"types": {
+		"JustAType": {
+			"doc": null,
+			"name": "JustAType",
+			"fields": [
+				{
+					"name": "Test",
+					"kind": "string",
+					"tag": "`json:\"string\"`",
+					"doc": null,
+					"imported_entity": null
+				}
+			],
+			"internalType": 4
+		},
+		"NaughtyImport": {
+			"doc": null,
+			"name": "NaughtyImport",
+			"fields": [
+				{
+					"name": "DangerousField",
+					"kind": "TestOne",
+					"tag": "",
+					"doc": null,
+					"imported_entity": {
+						"EntityName": "TestOne",
+						"PackageName": "examplestructs"
+					}
+				},
+				{
+					"name": "TestField",
+					"kind": "JustAType",
+					"tag": "",
+					"doc": null,
+					"imported_entity": null
+				}
+			],
+			"internalType": 4
+		},
+		"TestFive": {
+			"doc": null,
+			"name": "TestFive",
+			"fields": [
+				{
+					"name": "OneMoreStruct",
+					"kind": "TestOne",
+					"tag": "`json:\"another_struct\"`",
+					"doc": [
+						"// This is a comment"
+					],
+					"imported_entity": null
+				},
+				{
+					"name": "TwoMoreStructs",
+					"kind": "TestThree",
+					"tag": "`json:\"test_struct_easy\"`",
+					"doc": [
+						"// This is a comment"
+					],
+					"imported_entity": null
+				},
+				{
+					"name": "AnotherField",
+					"kind": "bool",
+					"tag": "`json:\"another_field\"`",
+					"doc": [
+						"// This is a comment"
+					],
+					"imported_entity": null
+				}
+			],
+			"internalType": 4
+		},
+		"TestFour": {
+			"doc": null,
+			"name": "TestFour",
+			"fields": [
+				{
+					"name": "TestThree",
+					"kind": "struct",
+					"tag": "",
+					"doc": null,
+					"imported_entity": null
+				},
+				{
+					"name": "TestOne",
+					"kind": "struct",
+					"tag": "",
+					"doc": null,
+					"imported_entity": null
+				},
+				{
+					"name": "AnotherField",
+					"kind": "bool",
+					"tag": "`json:\"another_field\"`",
+					"doc": null,
+					"imported_entity": null
+				}
+			],
+			"internalType": 4
+		},
+		"TestOne": {
+			"doc": null,
+			"name": "TestOne",
+			"fields": [
+				{
+					"name": "CloudinaryPublicID",
+					"kind": "string",
+					"tag": "`json:\"t_cloudinary_public_id\"`",
+					"doc": [
+						"// CloudinaryPublicID This is a comment"
+					],
+					"imported_entity": null
+				},
+				{
+					"name": "DBRecidProduct",
+					"kind": "int",
+					"tag": "`json:\"id_db_recid_product\"`",
+					"doc": [
+						"// This is a comment"
+					],
+					"imported_entity": null
+				},
+				{
+					"name": "ImageNumber",
+					"kind": "int",
+					"tag": "`json:\"c_imageNumber\"`",
+					"doc": [
+						"// This is a comment"
+					],
+					"imported_entity": null
+				}
+			],
+			"internalType": 4
+		},
+		"TestThree": {
+			"doc": null,
+			"name": "TestThree",
+			"fields": [
+				{
+					"name": "TestField",
+					"kind": "string",
+					"tag": "`json:\"test_field\"`",
+					"doc": null,
+					"imported_entity": null
+				}
+			],
+			"internalType": 4
+		},
+		"TestTwo": {
+			"doc": null,
+			"name": "TestTwo",
+			"fields": [
+				{
+					"name": "Fid",
+					"kind": "int",
+					"tag": "`json:\"recordId,string\"`",
+					"doc": [
+						"// This is a comment"
+					],
+					"imported_entity": null
+				}
+			],
+			"internalType": 4
+		}
+	}
+}
+```
