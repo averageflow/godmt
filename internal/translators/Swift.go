@@ -2,7 +2,6 @@ package translators
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
 )
@@ -79,42 +78,43 @@ Performing Swift translation!
 
 	for i := range t.scannedStructs {
 		var extendsClasses []string
+		var inheritedFields []syntaxtree.ScannedStructField
+
 		for j := range t.scannedStructs[i].Fields {
 			if isEmbeddedStructForInheritance(t.scannedStructs[i].Fields[j]) {
 				extendsClasses = append(extendsClasses, t.scannedStructs[i].Fields[j].Name)
+				inheritedFields = append(inheritedFields, t.scannedStructs[t.scannedStructs[i].Fields[j].Name].Fields...)
 			}
 		}
 
-		result += fmt.Sprintf("\nexport interface %s", t.scannedStructs[i].Name)
-		if len(extendsClasses) > 0 {
-			result += fmt.Sprintf(" extends %s", strings.Join(extendsClasses, ", "))
-		}
+		result += fmt.Sprintf("\nstruct %s: Decodable {\n", t.scannedStructs[i].Name)
 
-		result += fmt.Sprint(" {\n")
+		mergedWithInheritedFields := t.scannedStructs[i].Fields
+		mergedWithInheritedFields = append(mergedWithInheritedFields, inheritedFields...)
 
-		for j := range t.scannedStructs[i].Fields {
-			if isEmbeddedStructForInheritance(t.scannedStructs[i].Fields[j]) {
+		for j := range mergedWithInheritedFields {
+			if isEmbeddedStructForInheritance(mergedWithInheritedFields[j]) {
 				continue
 			}
 
-			tag := CleanTagName(t.scannedStructs[i].Fields[j].Tag)
+			tag := CleanTagName(mergedWithInheritedFields[j].Tag)
 			if tag == "" || t.preserve {
-				tag = t.scannedStructs[i].Fields[j].Name
+				tag = mergedWithInheritedFields[j].Name
 			}
 
-			if t.scannedStructs[i].Fields[j].Doc != nil {
-				for k := range t.scannedStructs[i].Fields[j].Doc {
-					result += fmt.Sprintf("\t%s\n", t.scannedStructs[i].Fields[j].Doc[k])
+			if mergedWithInheritedFields[j].Doc != nil {
+				for k := range mergedWithInheritedFields[j].Doc {
+					result += fmt.Sprintf("\t%s\n", mergedWithInheritedFields[j].Doc[k])
 				}
 			}
 
-			result += fmt.Sprintf("\t%s: %s;\n", tag, getSwiftCompatibleType(t.scannedStructs[i].Fields[j].Kind))
+			result += fmt.Sprintf("\tvar %s: %s\n", tag, getSwiftCompatibleType(mergedWithInheritedFields[j].Kind))
 
-			if t.scannedStructs[i].Fields[j].ImportDetails != nil {
+			if mergedWithInheritedFields[j].ImportDetails != nil {
 				imports += fmt.Sprintf(
 					"import { %s } from \"%s\";\n",
-					t.scannedStructs[i].Fields[j].ImportDetails.EntityName,
-					t.scannedStructs[i].Fields[j].ImportDetails.PackageName,
+					mergedWithInheritedFields[j].ImportDetails.EntityName,
+					mergedWithInheritedFields[j].ImportDetails.PackageName,
 				)
 			}
 		}
