@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
+	"github.com/iancoleman/strcase"
 )
 
 func CleanTagName(rawTagName string) string {
@@ -110,4 +111,8 @@ func sliceValuesToPrettyList(raw []string) string {
 	}
 
 	return strings.Join(result, ",\n")
+}
+
+func toCamelCase(raw string) string {
+	return strcase.ToLowerCamel(raw)
 }

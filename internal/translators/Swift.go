@@ -78,6 +78,10 @@ Performing Swift translation!
 			}
 		}
 
+		var structExtension string
+
+		structExtension += "\n\tenum CodingKeys: String, CodingKey {\n"
+
 		result += fmt.Sprintf("\nstruct %s: Decodable {\n", t.ScannedStructs[t.OrderedStructs[i]].Name)
 
 		mergedWithInheritedFields := t.ScannedStructs[t.OrderedStructs[i]].Fields
@@ -99,8 +103,12 @@ Performing Swift translation!
 				}
 			}
 
-			result += fmt.Sprintf("\tvar %s: %s\n", tag, getSwiftCompatibleType(mergedWithInheritedFields[j].Kind))
+			result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), getSwiftCompatibleType(mergedWithInheritedFields[j].Kind))
+			structExtension += fmt.Sprintf("\t\tcase %s = \"%s\"\n", toCamelCase(tag), tag)
 		}
+
+		structExtension += "\t}\n"
+		result += structExtension
 
 		result += "}\n"
 	}
