@@ -1,7 +1,7 @@
 # Go Schema Converter
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/averageflow/goschemaconverter)](https://goreportcard.com/report/github.com/averageflow/goschemaconverter)
-[![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/averageflow/goschemaconverter)](https://pkg.go.dev/github.com/averageflow/goschemaconverter)
+[![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/averageflow/goschemaconverter)](https://pkg.go.dev/github.com/averageflow/goschemaconverter/pkg)
 [![Issues](https://img.shields.io/github/issues/averageflow/goschemaconverter)](#)
 [![License](https://img.shields.io/github/license/averageflow/goschemaconverter.svg)](https://github.com/averageflow/goschemaconverter/blob/master/LICENSE.md)
 
