@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
+	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
+
 	"github.com/iancoleman/strcase"
 )
 
@@ -28,7 +29,7 @@ func CleanTagName(rawTagName string) string {
 	return strings.TrimSpace(result)
 }
 
-func isEmbeddedStructForInheritance(field syntaxtree.ScannedStructField) bool {
+func isEmbeddedStructForInheritance(field syntaxtreeparser.ScannedStructField) bool {
 	return field.Kind == "struct" && field.Tag == ""
 }
 
@@ -101,16 +102,6 @@ func transformSliceTypeToSwift(rawSliceType string) string {
 
 	result = strings.ReplaceAll(rawSliceType, "[]", "")
 	return fmt.Sprintf("[%s]", getSwiftCompatibleType(result))
-}
-
-func sliceValuesToPrettyList(raw []string) string {
-	var result []string
-
-	for i := range raw {
-		result = append(result, fmt.Sprintf("\t%s", raw[i]))
-	}
-
-	return strings.Join(result, ",\n")
 }
 
 func toCamelCase(raw string) string {

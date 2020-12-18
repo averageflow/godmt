@@ -4,19 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
+	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
 )
 
 type jsonFinalResult struct {
-	Enums map[string]syntaxtree.ScannedType   `json:"enums"`
-	Types map[string]syntaxtree.ScannedStruct `json:"types"`
+	Enums map[string]syntaxtreeparser.ScannedType   `json:"enums"`
+	Types map[string]syntaxtreeparser.ScannedStruct `json:"types"`
 }
 
 type JSONTranslator struct {
 	Translator
 }
 
-func (t *JSONTranslator) Setup(preserve bool, d map[string]syntaxtree.ScannedType, s map[string]syntaxtree.ScannedStruct) {
+func (t *JSONTranslator) Setup(preserve bool, d map[string]syntaxtreeparser.ScannedType, s map[string]syntaxtreeparser.ScannedStruct) {
 	t.Preserve = preserve
 	t.ScannedTypes = d
 	t.ScannedStructs = s

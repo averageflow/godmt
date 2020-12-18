@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
+
 	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
 	"github.com/averageflow/goschemaconverter/internal/translators"
 )
@@ -19,8 +21,8 @@ func main() {
 	tree := flag.Bool("tree", false, "should show the abstract syntax tree")
 	flag.Parse()
 
-	syntaxtree.ScanResult = make(map[string]syntaxtree.ScannedType)
-	syntaxtree.StructScanResult = make(map[string]syntaxtree.ScannedStruct)
+	syntaxtree.ScanResult = make(map[string]syntaxtreeparser.ScannedType)
+	syntaxtree.StructScanResult = make(map[string]syntaxtreeparser.ScannedStruct)
 	syntaxtree.ShouldPrintAbstractSyntaxTree = *tree
 
 	err := filepath.Walk(*scanPath, syntaxtree.GetFileCount)

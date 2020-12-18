@@ -8,7 +8,11 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
 )
+
+type visitor int
 
 func WalkSyntaxTree(f *ast.File) {
 	var v visitor
@@ -16,8 +20,8 @@ func WalkSyntaxTree(f *ast.File) {
 	ast.Walk(v, f)
 }
 
-var ScanResult map[string]ScannedType
-var StructScanResult map[string]ScannedStruct
+var ScanResult map[string]syntaxtreeparser.ScannedType
+var StructScanResult map[string]syntaxtreeparser.ScannedStruct
 var TotalFileCount int
 var ShouldPrintAbstractSyntaxTree bool
 

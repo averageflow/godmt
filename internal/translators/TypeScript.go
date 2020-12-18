@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
+	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
 )
 
 var goTypeScriptTypeMappings = map[string]string{
@@ -41,14 +41,14 @@ Performing TypeScript translation!
 		}
 
 		switch t.ScannedTypes[t.OrderedTypes[i]].InternalType {
-		case syntaxtree.ConstType:
+		case syntaxtreeparser.ConstType:
 			result += fmt.Sprintf(
 				"export const %s: %s = %s;\n\n",
 				t.ScannedTypes[t.OrderedTypes[i]].Name,
 				getTypescriptCompatibleType(t.ScannedTypes[t.OrderedTypes[i]].Kind),
 				t.ScannedTypes[t.OrderedTypes[i]].Value,
 			)
-		case syntaxtree.MapType:
+		case syntaxtreeparser.MapType:
 			result += fmt.Sprintf(
 				"export const %s: %s = {\n",
 				t.ScannedTypes[t.OrderedTypes[i]].Name,
@@ -56,13 +56,13 @@ Performing TypeScript translation!
 			)
 			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(t.ScannedTypes[t.OrderedTypes[i]].Value.(map[string]string)))
 			result += fmt.Sprint("};\n\n")
-		case syntaxtree.SliceType:
+		case syntaxtreeparser.SliceType:
 			result += fmt.Sprintf(
 				"export const %s: %s = [\n",
 				t.ScannedTypes[t.OrderedTypes[i]].Name,
 				transformSliceTypeToTypeScript(t.ScannedTypes[t.OrderedTypes[i]].Kind),
 			)
-			result += fmt.Sprintf("%s\n", sliceValuesToPrettyList(t.ScannedTypes[t.OrderedTypes[i]].Value.([]string)))
+			result += fmt.Sprintf("%s\n", syntaxtreeparser.SliceValuesToPrettyList(t.ScannedTypes[t.OrderedTypes[i]].Value.([]string)))
 
 			result += fmt.Sprint("];\n\n")
 		}

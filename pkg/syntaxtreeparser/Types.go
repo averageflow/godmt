@@ -1,4 +1,4 @@
-package syntaxtree
+package syntaxtreeparser
 
 const (
 	MapType    = 1
@@ -15,6 +15,7 @@ type ScannedType struct {
 	Doc          []string    `json:"doc"`
 	InternalType int         `json:"internalType"`
 }
+
 type ImportedEntityDetails struct {
 	EntityName  string
 	PackageName string
@@ -34,5 +35,3 @@ type ScannedStruct struct {
 	Fields       []ScannedStructField `json:"fields"`
 	InternalType int                  `json:"internalType"`
 }
-
-type visitor int

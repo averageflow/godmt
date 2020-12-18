@@ -5,10 +5,55 @@ import (
 	"go/ast"
 	"go/token"
 	"reflect"
+
+	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
 )
 
-func parseStruct(d *ast.Ident) []ScannedStruct {
-	var result []ScannedStruct
+func basicTypeLiteralParser(d *ast.Ident, item *ast.BasicLit) syntaxtreeparser.ScannedType {
+	itemType := fmt.Sprintf("%T", item.Value)
+
+	if item.Kind == token.INT {
+		itemType = "int64"
+	} else if item.Kind == token.FLOAT {
+		itemType = "float64"
+	}
+
+	rawDecl := reflect.ValueOf(d.Obj.Decl).Elem().Interface().(ast.ValueSpec)
+
+	return syntaxtreeparser.ScannedType{
+		Name:         d.Name,
+		Kind:         itemType,
+		Value:        item.Value,
+		Doc:          syntaxtreeparser.ExtractComments(rawDecl.Doc),
+		InternalType: syntaxtreeparser.ConstType,
+	}
+}
+
+func identifierParser(d *ast.Ident, item *ast.Ident) *syntaxtreeparser.ScannedType {
+	rawDecl := reflect.ValueOf(d.Obj.Decl).Elem().Interface().(ast.ValueSpec)
+
+	if item.Name == "true" || item.Name == "false" {
+		return &syntaxtreeparser.ScannedType{
+			Name:         d.Name,
+			Kind:         "bool",
+			Value:        item.Name,
+			Doc:          syntaxtreeparser.ExtractComments(rawDecl.Doc),
+			InternalType: syntaxtreeparser.ConstType,
+		}
+	}
+	return nil
+}
+
+func compositeLiteralMapParser() {
+
+}
+
+func compositeLiteralSliceParser() {
+
+}
+
+func parseStruct(d *ast.Ident) []syntaxtreeparser.ScannedStruct {
+	var result []syntaxtreeparser.ScannedStruct
 
 	structTypes := reflect.ValueOf(d.Obj.Decl).Elem().FieldByName("Type")
 	if !structTypes.IsValid() {
@@ -20,7 +65,7 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 		fields := structTypes.Interface().(*ast.StructType)
 		fieldList := fields.Fields.List
 
-		var rawScannedFields []ScannedStructField
+		var rawScannedFields []syntaxtreeparser.ScannedStructField
 
 		for i := range fieldList {
 			switch fieldList[i].Type.(type) {
@@ -36,8 +81,8 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 						tagValue = tag.Value
 					}
 
-					rawScannedFields = append(rawScannedFields, ScannedStructField{
-						Doc:  extractComments(fieldList[i].Doc),
+					rawScannedFields = append(rawScannedFields, syntaxtreeparser.ScannedStructField{
+						Doc:  syntaxtreeparser.ExtractComments(fieldList[i].Doc),
 						Name: fieldList[i].Names[0].Name,
 						Kind: fieldType.Interface().(string),
 						Tag:  tagValue,
@@ -52,7 +97,7 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 						tagValue = tag.Value
 					}
 
-					rawScannedFields = append(rawScannedFields, ScannedStructField{
+					rawScannedFields = append(rawScannedFields, syntaxtreeparser.ScannedStructField{
 						Doc:  nil,
 						Name: fieldType.Name,
 						Kind: "struct",
@@ -74,31 +119,31 @@ func parseStruct(d *ast.Ident) []ScannedStruct {
 				}
 
 				packageName := fmt.Sprintf("%s", reflect.ValueOf(fieldType.X).Elem().FieldByName("Name"))
-				rawScannedFields = append(rawScannedFields, ScannedStructField{
+				rawScannedFields = append(rawScannedFields, syntaxtreeparser.ScannedStructField{
 					Doc:  nil,
 					Name: fieldList[i].Names[0].Name,
 					Kind: fieldType.Sel.Name,
 					Tag:  tagValue,
-					ImportDetails: &ImportedEntityDetails{
+					ImportDetails: &syntaxtreeparser.ImportedEntityDetails{
 						EntityName:  fieldType.Sel.Name,
 						PackageName: packageName,
 					},
 				})
 			}
 		}
-		result = append(result, ScannedStruct{
+		result = append(result, syntaxtreeparser.ScannedStruct{
 			Doc:          nil,
 			Name:         d.Name,
 			Fields:       rawScannedFields,
-			InternalType: StructType,
+			InternalType: syntaxtreeparser.StructType,
 		})
 	}
 
 	return result
 }
 
-func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
-	var result []ScannedType
+func parseConstantsAndVariables(d *ast.Ident) []syntaxtreeparser.ScannedType {
+	var result []syntaxtreeparser.ScannedType
 
 	objectValues := reflect.ValueOf(d.Obj.Decl).Elem().FieldByName("Values")
 	if !objectValues.IsValid() {
@@ -111,37 +156,16 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 		switch values[i].(type) {
 		case *ast.BasicLit:
 			item := values[i].(*ast.BasicLit)
-			itemType := fmt.Sprintf("%T", item.Value)
+			parsed := basicTypeLiteralParser(d, item)
+			result = append(result, parsed)
 
-			if item.Kind == token.INT {
-				itemType = "int64"
-			} else if item.Kind == token.FLOAT {
-				itemType = "float64"
-			}
-
-			rawDecl := reflect.ValueOf(d.Obj.Decl).Elem().Interface().(ast.ValueSpec)
-
-			result = append(result, ScannedType{
-				Name:         d.Name,
-				Kind:         itemType,
-				Value:        item.Value,
-				Doc:          extractComments(rawDecl.Doc),
-				InternalType: ConstType,
-			})
 		case *ast.Ident:
 			item := values[i].(*ast.Ident)
-
-			rawDecl := reflect.ValueOf(d.Obj.Decl).Elem().Interface().(ast.ValueSpec)
-
-			if item.Name == "true" || item.Name == "false" {
-				result = append(result, ScannedType{
-					Name:         d.Name,
-					Kind:         "bool",
-					Value:        item.Name,
-					Doc:          extractComments(rawDecl.Doc),
-					InternalType: ConstType,
-				})
+			parsed := identifierParser(d, item)
+			if parsed != nil {
+				result = append(result, *parsed)
 			}
+
 		case *ast.CompositeLit:
 			item := values[i].(*ast.CompositeLit)
 			switch item.Type.(type) {
@@ -167,62 +191,31 @@ func parseConstantsAndVariables(d *ast.Ident) []ScannedType {
 					}
 				}
 
-				result = append(result, ScannedType{
+				result = append(result, syntaxtreeparser.ScannedType{
 					Name: d.Name,
 					Kind: fmt.Sprintf(
 						"map[%s]%s",
-						getMapValueType(item.Type.(*ast.MapType).Key),
-						getMapValueType(item.Type.(*ast.MapType).Value),
+						syntaxtreeparser.GetMapValueType(item.Type.(*ast.MapType).Key),
+						syntaxtreeparser.GetMapValueType(item.Type.(*ast.MapType).Value),
 					),
 					Value:        cleanMap,
-					InternalType: MapType,
+					InternalType: syntaxtreeparser.MapType,
 					Doc:          doc,
 				})
 			case *ast.ArrayType:
-				sliceType := getMapValueType(item.Type.(*ast.ArrayType).Elt)
+				sliceType := syntaxtreeparser.GetMapValueType(item.Type.(*ast.ArrayType).Elt)
 				rawDecl := reflect.ValueOf(d.Obj.Decl).Elem().Interface().(ast.ValueSpec)
 
-				result = append(result, ScannedType{
+				result = append(result, syntaxtreeparser.ScannedType{
 					Name:         d.Name,
 					Kind:         fmt.Sprintf("[]%s", sliceType),
-					Value:        extractSliceValues(item.Elts),
-					Doc:          extractComments(rawDecl.Doc),
-					InternalType: SliceType,
+					Value:        syntaxtreeparser.ExtractSliceValues(item.Elts),
+					Doc:          syntaxtreeparser.ExtractComments(rawDecl.Doc),
+					InternalType: syntaxtreeparser.SliceType,
 				})
 			}
 		}
 	}
 
-	return result
-}
-
-func extractComments(rawCommentGroup *ast.CommentGroup) []string {
-	var result []string
-	if rawCommentGroup == nil {
-		return result
-	}
-
-	commentList := rawCommentGroup.List
-	for i := range commentList {
-		result = append(result, commentList[i].Text)
-	}
-
-	return result
-}
-
-func getMapValueType(item ast.Expr) string {
-	switch item.(type) {
-	case *ast.Ident:
-		return item.(*ast.Ident).Name
-	default:
-		return "interface{}"
-	}
-}
-
-func extractSliceValues(items []ast.Expr) []string {
-	var result []string
-	for i := range items {
-		result = append(result, items[i].(*ast.BasicLit).Value)
-	}
 	return result
 }
