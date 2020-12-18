@@ -17,6 +17,7 @@ go run main.go -dir={scanDirectory} -translation={language} -preserve
 - `language` represents the output mode. If the `-translation` flag is not specified it will default to JSON. Currently supported options are:
     - `ts` or `typescript` for TypeScript conversion
     - `swift` for Swift conversion
+    - `json` for JSON conversion
 - `preserve` is an optional boolean flag which will make the output structs preserve the original names, instead of using the (`json:"tag"`).
 - `tree` is an optional boolean that when present will prevent any file operations being performed, and instead will show you the full abstract syntax tree of your files in the standard output.
 
