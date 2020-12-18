@@ -1,5 +1,8 @@
 # Go Schema Converter
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/averageflow/goschemaconverter)](https://goreportcard.com/report/github.com/averageflow/goschemaconverter)
+[![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/averageflow/goschemaconverter)](https://pkg.go.dev/github.com/averageflow/goschemaconverter)
+
 The goal of this repository is to provide a tool that can parse Go files that include `var`, `const`, `map`, `struct` and `type` into an abstract syntax tree, aka AST.
 
 That AST will then be transformed into data models for several programming languages. Some small adjustments may need to be made to integrate the output into a project, but this should already save you a lot of time and hassle, and will help you stay in sync with the Go version of your data models, in other languages.
