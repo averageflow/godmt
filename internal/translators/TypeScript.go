@@ -34,79 +34,81 @@ Performing TypeScript translation!
 	var result string
 
 	for i := range t.OrderedTypes {
-		if len(t.ScannedTypes[t.OrderedTypes[i]].Doc) > 0 {
-			for j := range t.ScannedTypes[t.OrderedTypes[i]].Doc {
-				result += fmt.Sprintf("%s\n", t.ScannedTypes[t.OrderedTypes[i]].Doc[j])
+		entity := t.ScannedTypes[t.OrderedTypes[i]]
+		if len(entity.Doc) > 0 {
+			for j := range entity.Doc {
+				result += fmt.Sprintf("%s\n", entity.Doc[j])
 			}
 		}
 
-		switch t.ScannedTypes[t.OrderedTypes[i]].InternalType {
+		switch entity.InternalType {
 		case syntaxtreeparser.ConstType:
 			result += fmt.Sprintf(
 				"export const %s: %s = %s;\n\n",
-				t.ScannedTypes[t.OrderedTypes[i]].Name,
-				getTypescriptCompatibleType(t.ScannedTypes[t.OrderedTypes[i]].Kind),
-				t.ScannedTypes[t.OrderedTypes[i]].Value,
+				entity.Name,
+				getTypescriptCompatibleType(entity.Kind),
+				entity.Value,
 			)
 		case syntaxtreeparser.MapType:
 			result += fmt.Sprintf(
 				"export const %s: %s = {\n",
-				t.ScannedTypes[t.OrderedTypes[i]].Name,
-				getRecordType(t.ScannedTypes[t.OrderedTypes[i]].Kind),
+				entity.Name,
+				getRecordType(entity.Kind),
 			)
-			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(t.ScannedTypes[t.OrderedTypes[i]].Value.(map[string]string)))
+			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
 			result += fmt.Sprint("};\n\n")
 		case syntaxtreeparser.SliceType:
 			result += fmt.Sprintf(
 				"export const %s: %s = [\n",
-				t.ScannedTypes[t.OrderedTypes[i]].Name,
-				transformSliceTypeToTypeScript(t.ScannedTypes[t.OrderedTypes[i]].Kind),
+				entity.Name,
+				transformSliceTypeToTypeScript(entity.Kind),
 			)
-			result += fmt.Sprintf("%s\n", syntaxtreeparser.SliceValuesToPrettyList(t.ScannedTypes[t.OrderedTypes[i]].Value.([]string)))
-
+			result += fmt.Sprintf("%s\n", syntaxtreeparser.SliceValuesToPrettyList(entity.Value.([]string)))
 			result += fmt.Sprint("];\n\n")
 		}
-
 	}
 
 	for i := range t.OrderedStructs {
 		var extendsClasses []string
-		for j := range t.ScannedStructs[t.OrderedStructs[i]].Fields {
-			if isEmbeddedStructForInheritance(t.ScannedStructs[t.OrderedStructs[i]].Fields[j]) {
-				extendsClasses = append(extendsClasses, t.ScannedStructs[t.OrderedStructs[i]].Fields[j].Name)
+
+		entity := t.ScannedStructs[t.OrderedStructs[i]]
+		for j := range entity.Fields {
+			if isEmbeddedStructForInheritance(entity.Fields[j]) {
+				extendsClasses = append(extendsClasses, entity.Fields[j].Name)
 			}
 		}
 
-		result += fmt.Sprintf("\nexport interface %s", t.ScannedStructs[t.OrderedStructs[i]].Name)
+		result += fmt.Sprintf("\nexport interface %s", entity.Name)
 		if len(extendsClasses) > 0 {
 			result += fmt.Sprintf(" extends %s", strings.Join(extendsClasses, ", "))
 		}
 
 		result += fmt.Sprint(" {\n")
 
-		for j := range t.ScannedStructs[t.OrderedStructs[i]].Fields {
-			if isEmbeddedStructForInheritance(t.ScannedStructs[t.OrderedStructs[i]].Fields[j]) {
+		for j := range entity.Fields {
+			entityField := entity.Fields[j]
+			if isEmbeddedStructForInheritance(entityField) {
 				continue
 			}
 
-			tag := CleanTagName(t.ScannedStructs[t.OrderedStructs[i]].Fields[j].Tag)
+			tag := syntaxtreeparser.CleanTagName(entityField.Tag)
 			if tag == "" || t.Preserve {
-				tag = t.ScannedStructs[t.OrderedStructs[i]].Fields[j].Name
+				tag = entityField.Name
 			}
 
-			if t.ScannedStructs[t.OrderedStructs[i]].Fields[j].Doc != nil {
-				for k := range t.ScannedStructs[t.OrderedStructs[i]].Fields[j].Doc {
-					result += fmt.Sprintf("\t%s\n", t.ScannedStructs[t.OrderedStructs[i]].Fields[j].Doc[k])
+			if entityField.Doc != nil {
+				for k := range entityField.Doc {
+					result += fmt.Sprintf("\t%s\n", entityField.Doc[k])
 				}
 			}
 
-			result += fmt.Sprintf("\t%s: %s;\n", tag, getTypescriptCompatibleType(t.ScannedStructs[t.OrderedStructs[i]].Fields[j].Kind))
+			result += fmt.Sprintf("\t%s: %s;\n", tag, getTypescriptCompatibleType(entityField.Kind))
 
-			if t.ScannedStructs[t.OrderedStructs[i]].Fields[j].ImportDetails != nil {
+			if entityField.ImportDetails != nil {
 				imports += fmt.Sprintf(
 					"import { %s } from \"%s\";\n",
-					t.ScannedStructs[t.OrderedStructs[i]].Fields[j].ImportDetails.EntityName,
-					t.ScannedStructs[t.OrderedStructs[i]].Fields[j].ImportDetails.PackageName,
+					entityField.ImportDetails.EntityName,
+					entityField.ImportDetails.PackageName,
 				)
 			}
 		}

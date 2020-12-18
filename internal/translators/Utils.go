@@ -9,26 +9,6 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-func CleanTagName(rawTagName string) string {
-	replacePatterns := []string{
-		",string",
-		"`json:\"",
-		"\" binding:\"",
-		"`uri:\"",
-		",omitempty",
-		"\"`",
-		`binding:"required"`,
-	}
-
-	result := rawTagName
-
-	for i := range replacePatterns {
-		result = strings.ReplaceAll(result, replacePatterns[i], "")
-	}
-
-	return strings.TrimSpace(result)
-}
-
 func isEmbeddedStructForInheritance(field syntaxtreeparser.ScannedStructField) bool {
 	return field.Kind == "struct" && field.Tag == ""
 }

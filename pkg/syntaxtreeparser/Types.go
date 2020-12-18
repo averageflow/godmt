@@ -1,5 +1,8 @@
 package syntaxtreeparser
 
+// The below constants represent the InternalType for a scanned type
+// this is used in the translators to determine more easily the type of object we are
+// performing operations on.
 const (
 	MapType    = 1
 	VarType    = 2
@@ -8,6 +11,8 @@ const (
 	SliceType  = 5
 )
 
+// ScannedType represents a basic entity to be translated.
+// More specifically const and var items.
 type ScannedType struct {
 	Name         string      `json:"name"`
 	Kind         string      `json:"kind"`
@@ -16,11 +21,14 @@ type ScannedType struct {
 	InternalType int         `json:"internalType"`
 }
 
+// ImportedEntityDetails represents the details of an imported item.
+// With that information an attempt of an import can be re-created in the translators.
 type ImportedEntityDetails struct {
 	EntityName  string
 	PackageName string
 }
 
+// ScannedStructField represents the details of a field inside a scanned struct.
 type ScannedStructField struct {
 	Name          string                 `json:"name"`
 	Kind          string                 `json:"kind"`
@@ -29,6 +37,7 @@ type ScannedStructField struct {
 	ImportDetails *ImportedEntityDetails `json:"imported_entity"`
 }
 
+// ScannedStruct represents the details of a scanned struct.
 type ScannedStruct struct {
 	Doc          []string             `json:"doc"`
 	Name         string               `json:"name"`

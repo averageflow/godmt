@@ -16,7 +16,7 @@ import (
 
 func main() {
 	scanPath := flag.String("dir", ".", "directory to scan")
-	translateMode := flag.String("translation", "json", "translation mode")
+	translateMode := flag.String("translation", translators.JSONTranslationMode, "translation mode")
 	preserveNames := flag.Bool("preserve", false, "should preserve the original struct field names")
 	tree := flag.Bool("tree", false, "should show the abstract syntax tree")
 	flag.Parse()
@@ -80,18 +80,21 @@ func main() {
 			Translator: baseTranslator,
 		}
 		resultingOutput = ts.Translate()
+		break
 	case translators.SwiftTranslationMode:
 		filename = "result.swift"
 		s := translators.SwiftTranslator{
 			Translator: baseTranslator,
 		}
 		resultingOutput = s.Translate()
+		break
 	default:
 		filename = "result.json"
 		j := translators.JSONTranslator{
 			Translator: baseTranslator,
 		}
 		resultingOutput = j.Translate()
+		break
 	}
 
 	f, err := os.Create(filename)
@@ -99,7 +102,7 @@ func main() {
 	defer f.Close()
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("FILE OPERATION ERROR ON %s: %s\n", filename, err.Error())
 		return
 	}
 

@@ -8,6 +8,7 @@ const (
 	TypeScriptTranslationMode = "typescript"
 	TSTranslationMode         = "ts"
 	SwiftTranslationMode      = "swift"
+	JSONTranslationMode       = "json"
 )
 
 type Translator struct {
