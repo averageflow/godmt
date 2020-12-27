@@ -74,10 +74,15 @@ func main() {
 			Data:     syntaxtree.Result[i],
 		}
 
-		filename := fmt.Sprintf("./result%s", strings.ReplaceAll(i, *scanPath, ""))
+		cleanPath := strings.TrimSuffix(*scanPath, "/")
 
-		packageName := strings.Split(strings.ReplaceAll(i, *scanPath, ""), "/")
-		os.Mkdir(fmt.Sprintf("./result/%s", packageName[1]), os.FileMode(0777))
+		filename := fmt.Sprintf("./result%s", strings.ReplaceAll(i, cleanPath, ""))
+
+		packageName := strings.Split(strings.ReplaceAll(i, cleanPath, ""), "/")
+
+		if len(packageName) == 3 {
+			os.Mkdir(fmt.Sprintf("./result/%s", packageName[1]), os.FileMode(0777))
+		}
 
 		switch *translateMode {
 
