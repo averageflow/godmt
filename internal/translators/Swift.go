@@ -16,6 +16,11 @@ var goSwiftTypeMappings = map[string]string{
 	"string":      "String",
 	"bool":        "Bool",
 	"interface{}": "Any",
+	"NullFloat64": "Float?",
+	"NullFloat32": "Float?",
+	"NullInt32":   "Int?",
+	"NullInt64":   "Int?",
+	"NullString":  "String?",
 }
 
 type SwiftTranslator struct {
@@ -31,8 +36,8 @@ Performing Swift translation!
 
 	var result string
 
-	for i := range t.OrderedTypes {
-		entity := t.ScannedTypes[t.OrderedTypes[i]]
+	for i := range t.Data.ConstantSort {
+		entity := t.Data.ScanResult[t.Data.ConstantSort[i]]
 		if len(entity.Doc) > 0 {
 			for j := range entity.Doc {
 				result += fmt.Sprintf("%s\n", entity.Doc[j])
@@ -66,16 +71,16 @@ Performing Swift translation!
 		}
 	}
 
-	for i := range t.OrderedStructs {
+	for i := range t.Data.StructSort {
 		var extendsClasses []string
 		var inheritedFields []syntaxtreeparser.ScannedStructField
 
-		entity := t.ScannedStructs[t.OrderedStructs[i]]
+		entity := t.Data.StructScanResult[t.Data.StructSort[i]]
 
 		for j := range entity.Fields {
 			if isEmbeddedStructForInheritance(entity.Fields[j]) {
 				extendsClasses = append(extendsClasses, entity.Fields[j].Name)
-				inheritedFields = append(inheritedFields, t.ScannedStructs[entity.Fields[j].Name].Fields...)
+				inheritedFields = append(inheritedFields, t.Data.StructScanResult[entity.Fields[j].Name].Fields...)
 			}
 		}
 

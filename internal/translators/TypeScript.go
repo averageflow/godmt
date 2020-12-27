@@ -17,6 +17,11 @@ var goTypeScriptTypeMappings = map[string]string{
 	"string":      "string",
 	"bool":        "boolean",
 	"interface{}": "any",
+	"NullFloat64": "number | null",
+	"NullFloat32": "number | null",
+	"NullInt32":   "number | null",
+	"NullInt64":   "number | null",
+	"NullString":  "string | null",
 }
 
 type TypeScriptTranslator struct {
@@ -33,8 +38,8 @@ Performing TypeScript translation!
 	var imports string
 	var result string
 
-	for i := range t.OrderedTypes {
-		entity := t.ScannedTypes[t.OrderedTypes[i]]
+	for i := range t.Data.ConstantSort {
+		entity := t.Data.ScanResult[t.Data.ConstantSort[i]]
 		if len(entity.Doc) > 0 {
 			for j := range entity.Doc {
 				result += fmt.Sprintf("%s\n", entity.Doc[j])
@@ -68,10 +73,10 @@ Performing TypeScript translation!
 		}
 	}
 
-	for i := range t.OrderedStructs {
+	for i := range t.Data.StructSort {
 		var extendsClasses []string
 
-		entity := t.ScannedStructs[t.OrderedStructs[i]]
+		entity := t.Data.StructScanResult[t.Data.StructSort[i]]
 		for j := range entity.Fields {
 			if isEmbeddedStructForInheritance(entity.Fields[j]) {
 				extendsClasses = append(extendsClasses, entity.Fields[j].Name)
@@ -102,7 +107,7 @@ Performing TypeScript translation!
 				}
 			}
 
-			result += fmt.Sprintf("\t%s: %s;\n", tag, getTypescriptCompatibleType(entityField.Kind))
+			result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), getTypescriptCompatibleType(entityField.Kind))
 
 			if entityField.ImportDetails != nil {
 				imports += fmt.Sprintf(
@@ -121,4 +126,12 @@ Performing TypeScript translation!
 	}
 
 	return result
+}
+
+func quoteWhenNeeded(raw string) string {
+	if strings.Contains(raw, ":") {
+		return fmt.Sprintf(`"%s"`, raw)
+	}
+
+	return raw
 }

@@ -5,3 +5,4 @@ cmd/goschemaconverter/goschemaconverter
 cmd/goschemaconverter/goschemaconverter-freebsd-x86
 cmd/goschemaconverter/goschemaconverter-darwin-x86
 cmd/goschemaconverter/goschemaconverter-linux-x86
+result/

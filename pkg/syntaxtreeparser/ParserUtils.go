@@ -145,10 +145,16 @@ func ImportedStructFieldParser(field *ast.Field) ScannedStructField {
 		tagValue = tag.Value
 	}
 
+	name := fmt.Sprintf("%s", field.Names)
+
+	if len(field.Names) > 0 {
+		name = field.Names[0].Name
+	}
+
 	packageName := fmt.Sprintf("%s", reflect.ValueOf(fieldType.X).Elem().FieldByName("Name"))
 	return ScannedStructField{
 		Doc:  nil,
-		Name: field.Names[0].Name,
+		Name: name,
 		Kind: fieldType.Sel.Name,
 		Tag:  tagValue,
 		ImportDetails: &ImportedEntityDetails{

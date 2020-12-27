@@ -1,6 +1,7 @@
 package translators
 
 import (
+	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
 	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
 )
 
@@ -12,11 +13,8 @@ const (
 )
 
 type Translator struct {
-	Preserve       bool
-	OrderedTypes   []string
-	ScannedTypes   map[string]syntaxtreeparser.ScannedType
-	OrderedStructs []string
-	ScannedStructs map[string]syntaxtreeparser.ScannedStruct
+	Preserve bool
+	Data     syntaxtree.FileResult
 }
 
 type TypeTranslator interface {

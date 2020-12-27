@@ -20,8 +20,15 @@ func WalkSyntaxTree(f *ast.File) {
 	ast.Walk(v, f)
 }
 
-var ScanResult map[string]syntaxtreeparser.ScannedType
-var StructScanResult map[string]syntaxtreeparser.ScannedStruct
+type FileResult struct {
+	ConstantSort     []string
+	ScanResult       map[string]syntaxtreeparser.ScannedType
+	StructScanResult map[string]syntaxtreeparser.ScannedStruct
+	StructSort       []string
+}
+
+var Result map[string]FileResult
+var CurrentFile string
 var TotalFileCount int
 var ShouldPrintAbstractSyntaxTree bool
 
@@ -49,18 +56,18 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 			result := parseStruct(d)
 
 			for i := range result {
-				_, ok := StructScanResult[result[i].Name]
+				_, ok := Result[CurrentFile].StructScanResult[result[i].Name]
 				if !ok {
-					StructScanResult[result[i].Name] = result[i]
+					Result[CurrentFile].StructScanResult[result[i].Name] = result[i]
 				}
 			}
 		} else if d.Obj.Kind == ast.Con || d.Obj.Kind == ast.Var {
 			result := parseConstantsAndVariables(d)
 
 			for i := range result {
-				_, ok := ScanResult[result[i].Name]
+				_, ok := Result[CurrentFile].ScanResult[result[i].Name]
 				if !ok {
-					ScanResult[result[i].Name] = result[i]
+					Result[CurrentFile].ScanResult[result[i].Name] = result[i]
 				}
 			}
 		}
@@ -102,6 +109,14 @@ func ScanDir(path string, info os.FileInfo, err error) error {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	CurrentFile = path
+	currentResult := Result[path]
+
+	currentResult.StructScanResult = make(map[string]syntaxtreeparser.ScannedStruct)
+	currentResult.ScanResult = make(map[string]syntaxtreeparser.ScannedType)
+
+	Result[path] = currentResult
 
 	WalkSyntaxTree(f)
 

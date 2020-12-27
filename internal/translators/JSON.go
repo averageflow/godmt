@@ -24,8 +24,8 @@ Performing JSON translation!
 	`)
 
 	payload := jsonFinalResult{
-		Enums: t.ScannedTypes,
-		Types: t.ScannedStructs,
+		Enums: t.Data.ScanResult,
+		Types: t.Data.StructScanResult,
 	}
 
 	result, err := json.MarshalIndent(payload, "", "\t")

@@ -58,6 +58,7 @@ func CleanTagName(rawTagName string) string {
 	replacePatterns := []string{
 		",string",
 		"`json:\"",
+		"`form:\"",
 		"\" binding:\"",
 		"`uri:\"",
 		",omitempty",

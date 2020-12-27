@@ -7,8 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-
-	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
+	"strings"
 
 	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
 	"github.com/averageflow/goschemaconverter/internal/translators"
@@ -21,8 +20,7 @@ func main() {
 	tree := flag.Bool("tree", false, "should show the abstract syntax tree")
 	flag.Parse()
 
-	syntaxtree.ScanResult = make(map[string]syntaxtreeparser.ScannedType)
-	syntaxtree.StructScanResult = make(map[string]syntaxtreeparser.ScannedStruct)
+	syntaxtree.Result = make(map[string]syntaxtree.FileResult)
 	syntaxtree.ShouldPrintAbstractSyntaxTree = *tree
 
 	err := filepath.Walk(*scanPath, syntaxtree.GetFileCount)
@@ -42,76 +40,87 @@ func main() {
 		os.Exit(0)
 	}
 
-	constantsOrderSlice := make([]string, len(syntaxtree.ScanResult))
-	structsOrderSlice := make([]string, len(syntaxtree.StructScanResult))
+	for i := range syntaxtree.Result {
+		item := syntaxtree.Result[i]
+		constantsOrderSlice := make([]string, len(item.ScanResult))
+		structsOrderSlice := make([]string, len(item.StructScanResult))
 
-	i := 0
-	for k := range syntaxtree.ScanResult {
-		constantsOrderSlice[i] = k
-		i++
+		j := 0
+		for k := range item.ScanResult {
+			constantsOrderSlice[j] = k
+			j++
+		}
+
+		j = 0
+		for k := range item.StructScanResult {
+			structsOrderSlice[j] = k
+			j++
+		}
+
+		sort.Strings(constantsOrderSlice)
+		sort.Strings(structsOrderSlice)
+
+		item.ConstantSort = constantsOrderSlice
+		item.StructSort = structsOrderSlice
+		syntaxtree.Result[i] = item
 	}
 
-	i = 0
-	for k := range syntaxtree.StructScanResult {
-		structsOrderSlice[i] = k
-		i++
-	}
-
-	sort.Strings(constantsOrderSlice)
-	sort.Strings(structsOrderSlice)
-
+	os.Mkdir("./result", os.FileMode(0777))
 	var resultingOutput string
-	var filename string
 
-	baseTranslator := translators.Translator{
-		Preserve:       *preserveNames,
-		OrderedTypes:   constantsOrderSlice,
-		ScannedTypes:   syntaxtree.ScanResult,
-		OrderedStructs: structsOrderSlice,
-		ScannedStructs: syntaxtree.StructScanResult,
-	}
-
-	switch *translateMode {
-
-	case translators.TypeScriptTranslationMode:
-	case translators.TSTranslationMode:
-		filename = "result.ts"
-		ts := translators.TypeScriptTranslator{
-			Translator: baseTranslator,
+	for i := range syntaxtree.Result {
+		baseTranslator := translators.Translator{
+			Preserve: *preserveNames,
+			Data:     syntaxtree.Result[i],
 		}
-		resultingOutput = ts.Translate()
-		break
-	case translators.SwiftTranslationMode:
-		filename = "result.swift"
-		s := translators.SwiftTranslator{
-			Translator: baseTranslator,
+
+		filename := fmt.Sprintf("./result%s", strings.ReplaceAll(i, *scanPath, ""))
+
+		packageName := strings.Split(strings.ReplaceAll(i, *scanPath, ""), "/")
+		os.Mkdir(fmt.Sprintf("./result/%s", packageName[1]), os.FileMode(0777))
+
+		switch *translateMode {
+
+		case translators.TypeScriptTranslationMode:
+		case translators.TSTranslationMode:
+			filename = strings.ReplaceAll(filename, ".go", ".ts")
+			ts := translators.TypeScriptTranslator{
+				Translator: baseTranslator,
+			}
+			resultingOutput = ts.Translate()
+			break
+		case translators.SwiftTranslationMode:
+			filename = strings.ReplaceAll(filename, ".go", ".swift")
+			s := translators.SwiftTranslator{
+				Translator: baseTranslator,
+			}
+			resultingOutput = s.Translate()
+			break
+		default:
+			filename = strings.ReplaceAll(filename, ".go", ".json")
+			j := translators.JSONTranslator{
+				Translator: baseTranslator,
+			}
+			resultingOutput = j.Translate()
+			break
 		}
-		resultingOutput = s.Translate()
-		break
-	default:
-		filename = "result.json"
-		j := translators.JSONTranslator{
-			Translator: baseTranslator,
+
+		f, err := os.Create(filename)
+
+		defer f.Close()
+
+		if err != nil {
+			fmt.Printf("FILE OPERATION ERROR ON %s: %s\n", filename, err.Error())
+			return
 		}
-		resultingOutput = j.Translate()
-		break
+
+		l, err := f.WriteString(resultingOutput)
+		if err != nil {
+			fmt.Println(err)
+			f.Close()
+			return
+		}
+
+		fmt.Printf("%d bytes written successfully", l)
 	}
-
-	f, err := os.Create(filename)
-
-	defer f.Close()
-
-	if err != nil {
-		fmt.Printf("FILE OPERATION ERROR ON %s: %s\n", filename, err.Error())
-		return
-	}
-
-	l, err := f.WriteString(resultingOutput)
-	if err != nil {
-		fmt.Println(err)
-		f.Close()
-		return
-	}
-
-	fmt.Printf("%d bytes written successfully", l)
 }
