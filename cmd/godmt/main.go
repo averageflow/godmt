@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/averageflow/godmt/internal/syntaxtree"
@@ -24,12 +23,12 @@ func main() {
 		log.Println(err)
 	}
 
-	fmt.Printf("Processing %d files!\n", syntaxtree.TotalFileCount)
-
 	err = filepath.Walk(config.WantedPath, syntaxtree.ScanDir)
 	if err != nil {
 		log.Println(err)
 	}
+
+	fmt.Println("Parsed files successfully!")
 
 	if syntaxtree.ShouldPrintAbstractSyntaxTree {
 		// Exit by displaying the AST tree
@@ -37,31 +36,10 @@ func main() {
 	}
 
 	for i := range syntaxtree.Result {
-		item := syntaxtree.Result[i]
-		constantsOrderSlice := make([]string, len(item.ScanResult))
-		structsOrderSlice := make([]string, len(item.StructScanResult))
-
-		j := 0
-
-		for k := range item.ScanResult {
-			constantsOrderSlice[j] = k
-			j++
-		}
-
-		j = 0
-
-		for k := range item.StructScanResult {
-			structsOrderSlice[j] = k
-			j++
-		}
-
-		sort.Strings(constantsOrderSlice)
-		sort.Strings(structsOrderSlice)
-
-		item.ConstantSort = constantsOrderSlice
-		item.StructSort = structsOrderSlice
-		syntaxtree.Result[i] = item
+		syntaxtree.Result[i] = syntaxtree.GetOrderedFileItems(syntaxtree.Result[i])
 	}
+
+	fmt.Println("Sorted items successfully!")
 
 	utils.CreateResultFolder()
 
@@ -110,4 +88,5 @@ func main() {
 	}
 
 	bar.Finish()
+	fmt.Println("Translation was successful!")
 }

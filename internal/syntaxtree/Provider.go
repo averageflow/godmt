@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"log"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/averageflow/godmt/pkg/godmt"
@@ -121,4 +122,31 @@ func ScanDir(path string, info os.FileInfo, err error) error {
 	WalkSyntaxTree(f)
 
 	return nil
+}
+
+func GetOrderedFileItems(item FileResult) FileResult {
+	constantsOrderSlice := make([]string, len(item.ScanResult))
+	structsOrderSlice := make([]string, len(item.StructScanResult))
+
+	j := 0
+
+	for k := range item.ScanResult {
+		constantsOrderSlice[j] = k
+		j++
+	}
+
+	j = 0
+
+	for k := range item.StructScanResult {
+		structsOrderSlice[j] = k
+		j++
+	}
+
+	sort.Strings(constantsOrderSlice)
+	sort.Strings(structsOrderSlice)
+
+	item.ConstantSort = constantsOrderSlice
+	item.StructSort = structsOrderSlice
+
+	return item
 }
