@@ -1,7 +1,7 @@
 # GoDMT
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/averageflow/godmt)](https://goreportcard.com/report/github.com/averageflow/godmt)
-[![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/averageflow/godmt)](https://pkg.go.dev/github.com/averageflow/godmt/pkg)
+[![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/averageflow/godmt)](https://pkg.go.dev/github.com/averageflow/godmt)
 [![Issues](https://img.shields.io/github/issues/averageflow/godmt)](#)
 [![License](https://img.shields.io/github/license/averageflow/godmt.svg)](https://github.com/averageflow/godmt/blob/master/LICENSE.md)
 
