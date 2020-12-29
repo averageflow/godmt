@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="250" height="150" src="web/DMT.png">
+</p>
+
 # GoDMT
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/averageflow/godmt)](https://goreportcard.com/report/github.com/averageflow/godmt)
