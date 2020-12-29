@@ -28,12 +28,12 @@ type TypeScriptTranslator struct {
 	Translator
 }
 
-func (t *TypeScriptTranslator) Translate() string {
+func (t *TypeScriptTranslator) Translate() string { //nolint:gocognit,gocyclo
 	var imports string
 
 	var result string
 
-	for i := range t.Data.ConstantSort {
+	for i := range t.Data.ConstantSort { //nolint:dupl
 		entity := t.Data.ScanResult[t.Data.ConstantSort[i]]
 		if len(entity.Doc) > 0 {
 			for j := range entity.Doc {
@@ -104,13 +104,16 @@ func (t *TypeScriptTranslator) Translate() string {
 
 			if len(entityField.SubFields) > 0 {
 				result += fmt.Sprintf("\t%s: {\n", quoteWhenNeeded(tag))
+
 				for k := range entityField.SubFields {
 					subtag := godmt.CleanTagName(entityField.SubFields[k].Tag)
 					if subtag == "" || t.Preserve {
 						subtag = entityField.SubFields[k].Name
 					}
+
 					result += fmt.Sprintf("\t\t%s: %s;\n", quoteWhenNeeded(subtag), GetTypescriptCompatibleType(entityField.SubFields[k].Kind))
 				}
+
 				result += "\t}\n"
 			} else {
 				result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), GetTypescriptCompatibleType(entityField.Kind))

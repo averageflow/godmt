@@ -9,15 +9,15 @@ import (
 // ExtractComments will transform a *ast.CommentGroup into a []string
 // which makes it more accessible and usable.
 func ExtractComments(rawCommentGroup *ast.CommentGroup) []string {
-	var result []string
-
 	if rawCommentGroup == nil {
-		return result
+		return nil
 	}
 
+	result := make([]string, len(rawCommentGroup.List))
 	commentList := rawCommentGroup.List
+
 	for i := range commentList {
-		result = append(result, commentList[i].Text)
+		result[i] = commentList[i].Text
 	}
 
 	return result
@@ -36,9 +36,9 @@ func GetMapValueType(item ast.Expr) string {
 // ExtractSliceValues will return the values of a []ast.Expr in the form
 // of a []string for ease of use.
 func ExtractSliceValues(items []ast.Expr) []string {
-	var result []string
+	result := make([]string, len(items))
 	for i := range items {
-		result = append(result, items[i].(*ast.BasicLit).Value)
+		result[i] = items[i].(*ast.BasicLit).Value
 	}
 
 	return result
@@ -47,10 +47,9 @@ func ExtractSliceValues(items []ast.Expr) []string {
 // SliceValuesToPrettyList will turn a normal []string into a line & comma
 // separated string, for pretty display of a slice's values.
 func SliceValuesToPrettyList(raw []string) string {
-	var result []string
-
+	result := make([]string, len(raw))
 	for i := range raw {
-		result = append(result, fmt.Sprintf("\t%s", raw[i]))
+		result[i] = fmt.Sprintf("\t%s", raw[i])
 	}
 
 	return strings.Join(result, ",\n")

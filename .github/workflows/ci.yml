@@ -1,0 +1,22 @@
+on: [push, pull_request]
+name: Test
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: [1.14.x, 1.15.x]
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Test
+        env:
+          CODECOV_TOKEN: 46a1b90c-0fe3-4cbc-87c6-cef958691f99
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          curl -s https://codecov.io/bash | bash

@@ -24,12 +24,12 @@ type FileResult struct {
 	StructSort       []string
 }
 
-var Result map[string]FileResult
-var CurrentFile string
-var TotalFileCount int
-var ShouldPrintAbstractSyntaxTree bool
+var Result map[string]FileResult       //nolint:gochecknoglobals
+var CurrentFile string                 //nolint:gochecknoglobals
+var TotalFileCount int                 //nolint:gochecknoglobals
+var ShouldPrintAbstractSyntaxTree bool //nolint:gochecknoglobals
 
-func WalkSyntaxTree(f *ast.File) {
+func WalkSyntaxTree(f *ast.File) { //nolint:interfacer
 	var v visitor
 
 	ast.Walk(v, f)

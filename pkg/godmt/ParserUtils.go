@@ -55,8 +55,13 @@ func CompositeLiteralMapParser(d *ast.Ident, mapElements []ast.Expr, item *ast.C
 		rawKey := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Key")
 		switch rawKey.Interface().(type) {
 		case *ast.BasicLit:
-			rawValue := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Value").Interface().(*ast.BasicLit)
-			cleanMap[fmt.Sprintf("%v", rawKey.Interface().(*ast.BasicLit).Value)] = rawValue.Value
+			rawValue := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Value").Interface()
+			switch item := rawValue.(type) {
+			case *ast.BasicLit:
+				cleanMap[fmt.Sprintf("%v", rawKey.Interface().(*ast.BasicLit).Value)] = item.Value
+			case *ast.Ident:
+				cleanMap[fmt.Sprintf("%v", rawKey.Interface().(*ast.BasicLit).Value)] = item.Name
+			}
 		default:
 			break
 		}

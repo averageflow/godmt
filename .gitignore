@@ -9,3 +9,4 @@ cmd/godmt/godmt-freebsd-amd64
 cmd/godmt/godmt-darwin-amd64
 cmd/godmt/godmt-linux-amd64
 result/
+coverage.out

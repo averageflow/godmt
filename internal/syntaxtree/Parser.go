@@ -21,6 +21,7 @@ func parseStruct(d *ast.Ident) []godmt.ScannedStruct {
 		fieldList := fields.Fields.List
 
 		var rawScannedFields []godmt.ScannedStructField
+
 		for i := range fieldList {
 			parsed := parseStructField(fieldList[i])
 			if parsed != nil {

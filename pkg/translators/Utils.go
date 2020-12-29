@@ -62,7 +62,7 @@ func GetDictionaryType(goMapType string) string {
 }
 
 func MapValuesToTypeScriptRecord(rawMap map[string]string) string {
-	var entries []string
+	var entries []string //nolint:prealloc
 	for i := range rawMap {
 		entries = append(entries, fmt.Sprintf("\t%s: %s", i, rawMap[i]))
 	}

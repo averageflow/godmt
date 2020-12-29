@@ -12,6 +12,10 @@ const (
 	JSONTranslationMode       = "json"
 )
 
+const (
+	StructTypeKeyWord = "struct"
+)
+
 type Translator struct {
 	Preserve bool
 	Data     syntaxtree.FileResult
