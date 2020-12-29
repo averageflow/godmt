@@ -36,7 +36,7 @@ func ParseApplicationConfig() OperationMode {
 		fmt.Printf("No directory specified! Defaulting to current working directory:\n%s\n", wantedPath)
 	}
 
-	wantedPath = strings.TrimSuffix(wantedPath, "/")
+	wantedPath = strings.TrimSuffix(wantedPath, string(os.PathSeparator))
 
 	return OperationMode{
 		WantedPath:    wantedPath,

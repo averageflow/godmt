@@ -9,7 +9,7 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-func isEmbeddedStructForInheritance(field godmt.ScannedStructField) bool {
+func isEmbeddedStructForInheritance(field *godmt.ScannedStructField) bool {
 	return field.Kind == "struct" && field.Tag == ""
 }
 
@@ -71,16 +71,12 @@ func mapValuesToTypeScriptRecord(rawMap map[string]string) string {
 }
 
 func transformSliceTypeToTypeScript(rawSliceType string) string {
-	var result string
-
-	result = strings.ReplaceAll(rawSliceType, "[]", "")
+	result := strings.ReplaceAll(rawSliceType, "[]", "")
 	return fmt.Sprintf("%s[]", getTypescriptCompatibleType(result))
 }
 
 func transformSliceTypeToSwift(rawSliceType string) string {
-	var result string
-
-	result = strings.ReplaceAll(rawSliceType, "[]", "")
+	result := strings.ReplaceAll(rawSliceType, "[]", "")
 	return fmt.Sprintf("[%s]", getSwiftCompatibleType(result))
 }
 

@@ -10,6 +10,7 @@ import (
 // which makes it more accessible and usable.
 func ExtractComments(rawCommentGroup *ast.CommentGroup) []string {
 	var result []string
+
 	if rawCommentGroup == nil {
 		return result
 	}
@@ -24,9 +25,9 @@ func ExtractComments(rawCommentGroup *ast.CommentGroup) []string {
 
 // GetMapValueType will return the type of a map's value fields.
 func GetMapValueType(item ast.Expr) string {
-	switch item.(type) {
+	switch value := item.(type) {
 	case *ast.Ident:
-		return item.(*ast.Ident).Name
+		return value.Name
 	default:
 		return "interface{}"
 	}
@@ -39,6 +40,7 @@ func ExtractSliceValues(items []ast.Expr) []string {
 	for i := range items {
 		result = append(result, items[i].(*ast.BasicLit).Value)
 	}
+
 	return result
 }
 

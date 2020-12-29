@@ -15,12 +15,6 @@ import (
 
 type visitor int
 
-func WalkSyntaxTree(f *ast.File) {
-	var v visitor
-
-	ast.Walk(v, f)
-}
-
 type FileResult struct {
 	ConstantSort     []string
 	ScanResult       map[string]godmt.ScannedType
@@ -33,8 +27,14 @@ var CurrentFile string
 var TotalFileCount int
 var ShouldPrintAbstractSyntaxTree bool
 
+func WalkSyntaxTree(f *ast.File) {
+	var v visitor
+
+	ast.Walk(v, f)
+}
+
 // Visit represents the actions to be performed on every node of the tree
-// n represents the node, whose type can be obtained with fmt.Sprintf and %T
+// n represents the node, whose type can be obtained with fmt.Sprintf and %T.
 func (v visitor) Visit(n ast.Node) ast.Visitor {
 	if n == nil {
 		return nil
@@ -43,11 +43,11 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 	if ShouldPrintAbstractSyntaxTree {
 		fmt.Printf("%s%T\n", strings.Repeat("\t", int(v)), n)
 		fmt.Printf("%d", v)
+
 		return v + 1
 	}
 
 	switch d := n.(type) {
-
 	case *ast.Ident:
 		if d.Obj == nil {
 			return v + 1
@@ -72,6 +72,9 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 				}
 			}
 		}
+
+	default:
+		break
 	}
 
 	return v + 1
@@ -86,7 +89,7 @@ func GetFileCount(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 
-	TotalFileCount += 1
+	TotalFileCount++
 
 	return nil
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/averageflow/godmt/pkg/godmt"
 )
 
-var goSwiftTypeMappings = map[string]string{
+var goSwiftTypeMappings = map[string]string{ //nolint:gochecknoglobals
 	"int":         "Int",
 	"int32":       "Int",
 	"int64":       "Int",
@@ -53,7 +53,7 @@ func (t *SwiftTranslator) Translate() string {
 				getDictionaryType(entity.Kind),
 			)
 			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
-			result += fmt.Sprint("]\n\n")
+			result += "]\n\n" //nolint:goconst
 		case godmt.SliceType:
 			result += fmt.Sprintf(
 				"var %s: %s = [\n",
@@ -61,19 +61,17 @@ func (t *SwiftTranslator) Translate() string {
 				transformSliceTypeToSwift(entity.Kind),
 			)
 			result += fmt.Sprintf("%s\n", godmt.SliceValuesToPrettyList(entity.Value.([]string)))
-			result += fmt.Sprint("];\n\n")
+			result += "];\n\n" //nolint:goconst
 		}
 	}
 
 	for i := range t.Data.StructSort {
-		var extendsClasses []string
 		var inheritedFields []godmt.ScannedStructField
 
 		entity := t.Data.StructScanResult[t.Data.StructSort[i]]
 
 		for j := range entity.Fields {
-			if isEmbeddedStructForInheritance(entity.Fields[j]) {
-				extendsClasses = append(extendsClasses, entity.Fields[j].Name)
+			if isEmbeddedStructForInheritance(&entity.Fields[j]) {
 				inheritedFields = append(inheritedFields, t.Data.StructScanResult[entity.Fields[j].Name].Fields...)
 			}
 		}
@@ -89,7 +87,7 @@ func (t *SwiftTranslator) Translate() string {
 
 		for j := range mergedWithInheritedFields {
 			entityField := mergedWithInheritedFields[j]
-			if isEmbeddedStructForInheritance(entityField) {
+			if isEmbeddedStructForInheritance(&entityField) {
 				continue
 			}
 
@@ -108,9 +106,9 @@ func (t *SwiftTranslator) Translate() string {
 			structExtension += fmt.Sprintf("\t\tcase %s = \"%s\"\n", toCamelCase(tag), tag)
 		}
 
-		structExtension += "\t}\n"
+		structExtension += "\t}\n" //nolint:goconst
 		result += structExtension
-		result += "}\n"
+		result += "}\n" //nolint:goconst
 	}
 
 	return result

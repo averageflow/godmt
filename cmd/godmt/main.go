@@ -30,7 +30,7 @@ func main() {
 
 	fmt.Println("Parsed files successfully!")
 
-	if syntaxtree.ShouldPrintAbstractSyntaxTree {
+	if config.Tree {
 		// Exit by displaying the AST tree
 		os.Exit(0)
 	}
@@ -58,7 +58,6 @@ func main() {
 		filename := fmt.Sprintf("./result%s", strings.ReplaceAll(i, config.WantedPath, ""))
 
 		switch config.TranslateMode {
-
 		case translators.TypeScriptTranslationMode:
 		case translators.TSTranslationMode:
 			filename = strings.ReplaceAll(filename, ".go", ".ts")
@@ -80,10 +79,9 @@ func main() {
 				Translator: baseTranslator,
 			}
 			resultingOutput = j.Translate()
-
 		}
 
-		packageName := strings.Split(strings.ReplaceAll(i, config.WantedPath, ""), "/")
+		packageName := strings.Split(strings.ReplaceAll(i, config.WantedPath, ""), string(os.PathSeparator))
 		utils.WriteResultToFile(resultingOutput, filename, packageName)
 	}
 

@@ -15,11 +15,18 @@ const (
 	correctFolderPermissions = 0744
 )
 
-func WriteResultToFile(result string, filename string, packageDeclaration []string) {
+func WriteResultToFile(result, filename string, packageDeclaration []string) {
 	if len(packageDeclaration) == correctSplitPackageLength {
 		// If the package is from another folder then we will create the needed folder
 		// else we simply don't need any packages
-		_ = os.Mkdir(fmt.Sprintf("./result/%s", packageDeclaration[1]), os.FileMode(correctFolderPermissions))
+		_ = os.Mkdir(
+			fmt.Sprintf(
+				".%sresult%s%s",
+				string(os.PathSeparator),
+				string(os.PathSeparator),
+				packageDeclaration[1],
+			),
+			os.FileMode(correctFolderPermissions))
 	}
 
 	f, err := os.Create(filename)
@@ -38,10 +45,16 @@ func WriteResultToFile(result string, filename string, packageDeclaration []stri
 }
 
 func CreateResultFolder() {
-	err := os.Mkdir("./result", os.FileMode(correctFolderPermissions))
+	err := os.Mkdir(
+		fmt.Sprintf(
+			".%sresult",
+			string(os.PathSeparator),
+		),
+		os.FileMode(correctFolderPermissions),
+	)
 	if errors.Is(err, os.ErrExist) {
 		fmt.Println("Skipping folder creation since folder existed!")
-	} else {
-		log.Fatalln(err.Error())
+	} else if err != nil {
+		log.Println(err.Error())
 	}
 }

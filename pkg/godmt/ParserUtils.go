@@ -31,7 +31,7 @@ func BasicTypeLiteralParser(d *ast.Ident, item *ast.BasicLit) ScannedType {
 
 // IdentifierParser will try to extract the type of an identifier, like booleans.
 // This will return a pointer to a ScannedType, thus the result should be checked for nil.
-func IdentifierParser(d *ast.Ident, item *ast.Ident) *ScannedType {
+func IdentifierParser(d, item *ast.Ident) *ScannedType {
 	rawDecl := reflect.ValueOf(d.Obj.Decl).Elem().Interface().(ast.ValueSpec)
 
 	if item.Name == "true" || item.Name == "false" {
@@ -43,6 +43,7 @@ func IdentifierParser(d *ast.Ident, item *ast.Ident) *ScannedType {
 			InternalType: ConstType,
 		}
 	}
+
 	return nil
 }
 
@@ -56,6 +57,8 @@ func CompositeLiteralMapParser(d *ast.Ident, mapElements []ast.Expr, item *ast.C
 		case *ast.BasicLit:
 			rawValue := reflect.ValueOf(mapElements[j]).Elem().FieldByName("Value").Interface().(*ast.BasicLit)
 			cleanMap[fmt.Sprintf("%v", rawKey.Interface().(*ast.BasicLit).Value)] = rawValue.Value
+		default:
+			break
 		}
 	}
 
@@ -114,22 +117,22 @@ func SimpleStructFieldParser(field *ast.Field) ScannedStructField {
 			Kind: fieldType.Interface().(string),
 			Tag:  tagValue,
 		}
-	} else {
-		// Struct inside a struct
-		fieldType := reflect.ValueOf(field.Type).Elem().FieldByName("Obj").Interface().(*ast.Object)
-		tag := field.Tag
+	}
 
-		var tagValue string
-		if tag != nil {
-			tagValue = tag.Value
-		}
+	// Struct inside a struct
+	fieldType := reflect.ValueOf(field.Type).Elem().FieldByName("Obj").Interface().(*ast.Object)
+	tag := field.Tag
 
-		return ScannedStructField{
-			Doc:  nil,
-			Name: fieldType.Name,
-			Kind: "struct",
-			Tag:  tagValue,
-		}
+	var tagValue string
+	if tag != nil {
+		tagValue = tag.Value
+	}
+
+	return ScannedStructField{
+		Doc:  nil,
+		Name: fieldType.Name,
+		Kind: "struct",
+		Tag:  tagValue,
 	}
 }
 
@@ -152,6 +155,7 @@ func ImportedStructFieldParser(field *ast.Field) ScannedStructField {
 	}
 
 	packageName := fmt.Sprintf("%s", reflect.ValueOf(fieldType.X).Elem().FieldByName("Name"))
+
 	return ScannedStructField{
 		Doc:  nil,
 		Name: name,

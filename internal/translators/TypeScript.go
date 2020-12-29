@@ -7,7 +7,7 @@ import (
 	"github.com/averageflow/godmt/pkg/godmt"
 )
 
-var goTypeScriptTypeMappings = map[string]string{
+var goTypeScriptTypeMappings = map[string]string{ //nolint:gochecknoglobals
 	"int":         "number",
 	"int32":       "number",
 	"int64":       "number",
@@ -30,6 +30,7 @@ type TypeScriptTranslator struct {
 
 func (t *TypeScriptTranslator) Translate() string {
 	var imports string
+
 	var result string
 
 	for i := range t.Data.ConstantSort {
@@ -55,7 +56,7 @@ func (t *TypeScriptTranslator) Translate() string {
 				getRecordType(entity.Kind),
 			)
 			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
-			result += fmt.Sprint("};\n\n")
+			result += "};\n\n"
 		case godmt.SliceType:
 			result += fmt.Sprintf(
 				"export const %s: %s = [\n",
@@ -63,7 +64,7 @@ func (t *TypeScriptTranslator) Translate() string {
 				transformSliceTypeToTypeScript(entity.Kind),
 			)
 			result += fmt.Sprintf("%s\n", godmt.SliceValuesToPrettyList(entity.Value.([]string)))
-			result += fmt.Sprint("];\n\n")
+			result += "];\n\n"
 		}
 	}
 
@@ -72,7 +73,7 @@ func (t *TypeScriptTranslator) Translate() string {
 
 		entity := t.Data.StructScanResult[t.Data.StructSort[i]]
 		for j := range entity.Fields {
-			if isEmbeddedStructForInheritance(entity.Fields[j]) {
+			if isEmbeddedStructForInheritance(&entity.Fields[j]) {
 				extendsClasses = append(extendsClasses, entity.Fields[j].Name)
 			}
 		}
@@ -82,11 +83,11 @@ func (t *TypeScriptTranslator) Translate() string {
 			result += fmt.Sprintf(" extends %s", strings.Join(extendsClasses, ", "))
 		}
 
-		result += fmt.Sprint(" {\n")
+		result += " {\n"
 
 		for j := range entity.Fields {
 			entityField := entity.Fields[j]
-			if isEmbeddedStructForInheritance(entityField) {
+			if isEmbeddedStructForInheritance(&entityField) {
 				continue
 			}
 
