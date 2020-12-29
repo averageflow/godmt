@@ -99,7 +99,7 @@ func CompositeLiteralSliceParser(d *ast.Ident, sliceType string, item *ast.Compo
 
 // ImportedStructFieldParser will transform a field of a struct that contains a basic entity
 // into a program readable ScannedStructField.
-func SimpleStructFieldParser(field *ast.Field) ScannedStructField {
+func SimpleStructFieldParser(field *ast.Field) *ScannedStructField {
 	if field.Names != nil {
 		// Basic type of a field inside a struct
 		fieldType := reflect.ValueOf(field.Type).Elem().FieldByName("Name")
@@ -111,7 +111,7 @@ func SimpleStructFieldParser(field *ast.Field) ScannedStructField {
 			tagValue = tag.Value
 		}
 
-		return ScannedStructField{
+		return &ScannedStructField{
 			Doc:  ExtractComments(field.Doc),
 			Name: field.Names[0].Name,
 			Kind: fieldType.Interface().(string),
@@ -128,7 +128,7 @@ func SimpleStructFieldParser(field *ast.Field) ScannedStructField {
 		tagValue = tag.Value
 	}
 
-	return ScannedStructField{
+	return &ScannedStructField{
 		Doc:  nil,
 		Name: fieldType.Name,
 		Kind: "struct",
@@ -138,7 +138,7 @@ func SimpleStructFieldParser(field *ast.Field) ScannedStructField {
 
 // ImportedStructFieldParser will transform a field of a struct that contains an imported entity
 // into a program readable ScannedStructField.
-func ImportedStructFieldParser(field *ast.Field) ScannedStructField {
+func ImportedStructFieldParser(field *ast.Field) *ScannedStructField {
 	fieldType := reflect.ValueOf(field.Type).Interface().(*ast.SelectorExpr)
 
 	tag := field.Tag
@@ -156,7 +156,7 @@ func ImportedStructFieldParser(field *ast.Field) ScannedStructField {
 
 	packageName := fmt.Sprintf("%s", reflect.ValueOf(fieldType.X).Elem().FieldByName("Name"))
 
-	return ScannedStructField{
+	return &ScannedStructField{
 		Doc:  nil,
 		Name: name,
 		Kind: fieldType.Sel.Name,

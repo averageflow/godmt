@@ -6,8 +6,6 @@ import (
 	"log"
 	"os"
 	"strings"
-
-	"github.com/averageflow/godmt/pkg/translators"
 )
 
 type OperationMode struct {
@@ -19,7 +17,7 @@ type OperationMode struct {
 
 func ParseApplicationConfig() OperationMode {
 	scanPath := flag.String("dir", "", "directory to scan")
-	translateMode := flag.String("translation", translators.JSONTranslationMode, "translation mode")
+	translateMode := flag.String("translation", "json", "translation mode")
 	preserveNames := flag.Bool("preserve", false, "should preserve the original struct field names")
 	tree := flag.Bool("tree", false, "should show the abstract syntax tree")
 

@@ -34,7 +34,8 @@ type ScannedStructField struct {
 	Kind          string                 `json:"kind"`
 	Tag           string                 `json:"tag"`
 	Doc           []string               `json:"doc"`
-	ImportDetails *ImportedEntityDetails `json:"imported_entity"`
+	ImportDetails *ImportedEntityDetails `json:"importedEntity"`
+	SubFields     []ScannedStructField   `json:"subFields"`
 }
 
 // ScannedStruct represents the details of a scanned struct.

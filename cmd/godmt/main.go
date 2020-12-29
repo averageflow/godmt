@@ -14,9 +14,8 @@ import (
 )
 
 func main() {
-	syntaxtree.Result = make(map[string]syntaxtree.FileResult)
-
 	config := utils.ParseApplicationConfig()
+	syntaxtree.ResetGlobals(config)
 
 	err := filepath.Walk(config.WantedPath, syntaxtree.GetFileCount)
 	if err != nil {

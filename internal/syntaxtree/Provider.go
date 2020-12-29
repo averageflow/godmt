@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/averageflow/godmt/internal/utils"
+
 	"github.com/averageflow/godmt/pkg/godmt"
 )
 
@@ -152,4 +154,11 @@ func GetOrderedFileItems(item FileResult) FileResult {
 	item.StructSort = structsOrderSlice
 
 	return item
+}
+
+func ResetGlobals(config utils.OperationMode) {
+	Result = make(map[string]FileResult)
+	CurrentFile = ""
+	TotalFileCount = 0
+	ShouldPrintAbstractSyntaxTree = config.Tree
 }
