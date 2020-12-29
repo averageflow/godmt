@@ -39,7 +39,7 @@ func main() {
 		syntaxtree.Result[i] = syntaxtree.GetOrderedFileItems(syntaxtree.Result[i])
 	}
 
-	fmt.Println("Sorted items successfully!")
+	fmt.Println("Sorted parsed items successfully!")
 
 	utils.CreateResultFolder()
 
@@ -86,5 +86,5 @@ func main() {
 	}
 
 	bar.Finish()
-	fmt.Println("Translation was successful!")
+	fmt.Println("Translation was successful! All operations completed!")
 }

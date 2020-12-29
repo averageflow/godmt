@@ -11,6 +11,8 @@ That AST will then be transformed into data models for several programming langu
 
 Comments will be carried over :)
 
+Currently, the only supported operating systems are Linux, BSD and macOS.
+
 
 ## Usage
 
