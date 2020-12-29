@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
 )
 
 type jsonFinalResult struct {

@@ -1,6 +1,6 @@
 package exampleconstants
 
-import "github.com/averageflow/goschemaconverter/tests/data/examplestructs"
+import "github.com/averageflow/godmt/tests/data/examplestructs"
 
 const (
 	NumberOne = 1

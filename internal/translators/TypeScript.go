@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
 )
 
 var goTypeScriptTypeMappings = map[string]string{

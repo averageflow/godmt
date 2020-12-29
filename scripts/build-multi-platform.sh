@@ -1,14 +1,14 @@
 #!/bin/sh
 
-cd ../cmd/goschemaconverter
+cd ../cmd/godmt
 
 # Linux build
-GOOS=linux GOARCH=amd64 go build -o goschemaconverter-linux-x86
+GOOS=linux GOARCH=amd64 go build -o godmt-linux-x86
 
 # macOS build
-GOOS=darwin GOARCH=amd64 go build -o goschemaconverter-darwin-x86
+GOOS=darwin GOARCH=amd64 go build -o godmt-darwin-x86
 
 # FreeBSD build
-GOOS=freebsd GOARCH=amd64 go build -o goschemaconverter-freebsd-x86
+GOOS=freebsd GOARCH=amd64 go build -o godmt-freebsd-x86
 
 

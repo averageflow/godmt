@@ -3,7 +3,7 @@ package translators
 import (
 	"fmt"
 
-	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
 )
 
 var goSwiftTypeMappings = map[string]string{

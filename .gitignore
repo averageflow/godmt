@@ -1,8 +1,8 @@
 .idea/
 .DS_Store
-cmd/goschemaconverter/result*.*
-cmd/goschemaconverter/goschemaconverter
-cmd/goschemaconverter/goschemaconverter-freebsd-x86
-cmd/goschemaconverter/goschemaconverter-darwin-x86
-cmd/goschemaconverter/goschemaconverter-linux-x86
+cmd/godmt/result*.*
+cmd/godmt/godmt
+cmd/godmt/godmt-freebsd-x86
+cmd/godmt/godmt-darwin-x86
+cmd/godmt/godmt-linux-x86
 result/

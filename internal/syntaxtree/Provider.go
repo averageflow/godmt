@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
 )
 
 type visitor int

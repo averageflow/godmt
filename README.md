@@ -1,11 +1,11 @@
-# Go Schema Converter
+# GoDMT
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/averageflow/goschemaconverter)](https://goreportcard.com/report/github.com/averageflow/goschemaconverter)
-[![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/averageflow/goschemaconverter)](https://pkg.go.dev/github.com/averageflow/goschemaconverter/pkg)
-[![Issues](https://img.shields.io/github/issues/averageflow/goschemaconverter)](#)
-[![License](https://img.shields.io/github/license/averageflow/goschemaconverter.svg)](https://github.com/averageflow/goschemaconverter/blob/master/LICENSE.md)
+[![Go Report Card](https://goreportcard.com/badge/github.com/averageflow/godmt)](https://goreportcard.com/report/github.com/averageflow/godmt)
+[![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/averageflow/godmt)](https://pkg.go.dev/github.com/averageflow/godmt/pkg)
+[![Issues](https://img.shields.io/github/issues/averageflow/godmt)](#)
+[![License](https://img.shields.io/github/license/averageflow/godmt.svg)](https://github.com/averageflow/godmt/blob/master/LICENSE.md)
 
-The goal of this repository is to provide a tool that can parse Go files that include `var`, `const`, `map`, `struct` and `type` into an abstract syntax tree, aka AST.
+GoDMT, the one and only Go Data Model Translator. The goal of this project is to provide a tool that can parse Go files that include `var`, `const`, `map`, `struct` and `type` into an abstract syntax tree, aka AST.
 
 That AST will then be transformed into data models for several programming languages. Some small adjustments may need to be made to integrate the output into a project, but this should already save you a lot of time and hassle, and will help you stay in sync with the Go version of your data models, in other languages.
 
@@ -15,7 +15,7 @@ Comments will be carried over :)
 ## Usage
 
 ```
-go run main.go -dir={scanDirectory} -translation={language} -preserve
+go run main.go -dir={scanDirectory} -translation={language} -preserve -tree
 ```
 
 - `scanDirectory` represents a string that is the relative path of the directory whose Go files you want to scan. The scan occurs in a recursive manner, so all files from all contained folders will be scanned.
@@ -40,4 +40,4 @@ Feel free to browse some [examples that I am happy to provide here](examples/Con
 
 ## Building
 
-To build this application as a binary simply navigate to `cmd/goschemaconverter` and run `go build`.
+To build this application as a binary simply navigate to `cmd/godmt` and run `go build`.

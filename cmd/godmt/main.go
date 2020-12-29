@@ -9,8 +9,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
-	"github.com/averageflow/goschemaconverter/internal/translators"
+	"github.com/averageflow/godmt/internal/syntaxtree"
+	"github.com/averageflow/godmt/internal/translators"
 )
 
 func main() {

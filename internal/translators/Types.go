@@ -1,8 +1,8 @@
 package translators
 
 import (
-	"github.com/averageflow/goschemaconverter/internal/syntaxtree"
-	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/internal/syntaxtree"
+	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
 )
 
 const (

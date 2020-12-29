@@ -1,4 +1,4 @@
-module github.com/averageflow/goschemaconverter
+module github.com/averageflow/godmt
 
 go 1.15
 

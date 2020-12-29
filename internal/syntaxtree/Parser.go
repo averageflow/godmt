@@ -5,7 +5,7 @@ import (
 	"go/ast"
 	"reflect"
 
-	"github.com/averageflow/goschemaconverter/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
 )
 
 func parseStruct(d *ast.Ident) []syntaxtreeparser.ScannedStruct {
