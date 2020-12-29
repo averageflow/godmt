@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/averageflow/godmt/internal/translators"
+	"github.com/averageflow/godmt/pkg/translators"
 )
 
 type OperationMode struct {

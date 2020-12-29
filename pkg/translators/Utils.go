@@ -9,11 +9,11 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-func isEmbeddedStructForInheritance(field *godmt.ScannedStructField) bool {
+func IsEmbeddedStructForInheritance(field *godmt.ScannedStructField) bool {
 	return field.Kind == "struct" && field.Tag == ""
 }
 
-func getTypescriptCompatibleType(goType string) string {
+func GetTypescriptCompatibleType(goType string) string {
 	result, ok := goTypeScriptTypeMappings[goType]
 	if !ok {
 		return goType
@@ -22,7 +22,7 @@ func getTypescriptCompatibleType(goType string) string {
 	return result
 }
 
-func getSwiftCompatibleType(goType string) string {
+func GetSwiftCompatibleType(goType string) string {
 	result, ok := goSwiftTypeMappings[goType]
 	if !ok {
 		return goType
@@ -31,14 +31,14 @@ func getSwiftCompatibleType(goType string) string {
 	return result
 }
 
-func getRecordType(goMapType string) string {
+func GetRecordType(goMapType string) string {
 	var result string
 
 	result = strings.ReplaceAll(goMapType, "map[", "")
 	recordTypes := strings.Split(result, "]")
 
 	for i := range recordTypes {
-		recordTypes[i] = getTypescriptCompatibleType(recordTypes[i])
+		recordTypes[i] = GetTypescriptCompatibleType(recordTypes[i])
 	}
 
 	result = strings.Join(recordTypes, ", ")
@@ -46,14 +46,14 @@ func getRecordType(goMapType string) string {
 	return fmt.Sprintf("Record<%s>", result)
 }
 
-func getDictionaryType(goMapType string) string {
+func GetDictionaryType(goMapType string) string {
 	var result string
 
 	result = strings.ReplaceAll(goMapType, "map[", "")
 	recordTypes := strings.Split(result, "]")
 
 	for i := range recordTypes {
-		recordTypes[i] = getSwiftCompatibleType(recordTypes[i])
+		recordTypes[i] = GetSwiftCompatibleType(recordTypes[i])
 	}
 
 	result = strings.Join(recordTypes, ", ")
@@ -61,7 +61,7 @@ func getDictionaryType(goMapType string) string {
 	return fmt.Sprintf("Dictionary<%s>", result)
 }
 
-func mapValuesToTypeScriptRecord(rawMap map[string]string) string {
+func MapValuesToTypeScriptRecord(rawMap map[string]string) string {
 	var entries []string
 	for i := range rawMap {
 		entries = append(entries, fmt.Sprintf("\t%s: %s", i, rawMap[i]))
@@ -70,14 +70,14 @@ func mapValuesToTypeScriptRecord(rawMap map[string]string) string {
 	return strings.Join(entries, ",\n")
 }
 
-func transformSliceTypeToTypeScript(rawSliceType string) string {
+func TransformSliceTypeToTypeScript(rawSliceType string) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
-	return fmt.Sprintf("%s[]", getTypescriptCompatibleType(result))
+	return fmt.Sprintf("%s[]", GetTypescriptCompatibleType(result))
 }
 
-func transformSliceTypeToSwift(rawSliceType string) string {
+func TransformSliceTypeToSwift(rawSliceType string) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
-	return fmt.Sprintf("[%s]", getSwiftCompatibleType(result))
+	return fmt.Sprintf("[%s]", GetSwiftCompatibleType(result))
 }
 
 func toCamelCase(raw string) string {

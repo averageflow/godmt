@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/averageflow/godmt/internal/syntaxtree"
-	"github.com/averageflow/godmt/internal/translators"
 	"github.com/averageflow/godmt/internal/utils"
+	"github.com/averageflow/godmt/pkg/translators"
 	"github.com/cheggaaa/pb/v3"
 )
 

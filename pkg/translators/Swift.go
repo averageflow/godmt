@@ -43,22 +43,22 @@ func (t *SwiftTranslator) Translate() string {
 			result += fmt.Sprintf(
 				"let %s: %s = %s\n\n",
 				entity.Name,
-				getSwiftCompatibleType(entity.Kind),
+				GetSwiftCompatibleType(entity.Kind),
 				entity.Value,
 			)
 		case godmt.MapType:
 			result += fmt.Sprintf(
 				"let %s: %s = [\n",
 				entity.Name,
-				getDictionaryType(entity.Kind),
+				GetDictionaryType(entity.Kind),
 			)
-			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
+			result += fmt.Sprintf("%s\n", MapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
 			result += "]\n\n" //nolint:goconst
 		case godmt.SliceType:
 			result += fmt.Sprintf(
 				"var %s: %s = [\n",
 				entity.Name,
-				transformSliceTypeToSwift(entity.Kind),
+				TransformSliceTypeToSwift(entity.Kind),
 			)
 			result += fmt.Sprintf("%s\n", godmt.SliceValuesToPrettyList(entity.Value.([]string)))
 			result += "];\n\n" //nolint:goconst
@@ -71,7 +71,7 @@ func (t *SwiftTranslator) Translate() string {
 		entity := t.Data.StructScanResult[t.Data.StructSort[i]]
 
 		for j := range entity.Fields {
-			if isEmbeddedStructForInheritance(&entity.Fields[j]) {
+			if IsEmbeddedStructForInheritance(&entity.Fields[j]) {
 				inheritedFields = append(inheritedFields, t.Data.StructScanResult[entity.Fields[j].Name].Fields...)
 			}
 		}
@@ -87,7 +87,7 @@ func (t *SwiftTranslator) Translate() string {
 
 		for j := range mergedWithInheritedFields {
 			entityField := mergedWithInheritedFields[j]
-			if isEmbeddedStructForInheritance(&entityField) {
+			if IsEmbeddedStructForInheritance(&entityField) {
 				continue
 			}
 
@@ -102,7 +102,7 @@ func (t *SwiftTranslator) Translate() string {
 				}
 			}
 
-			result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), getSwiftCompatibleType(entityField.Kind))
+			result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), GetSwiftCompatibleType(entityField.Kind))
 			structExtension += fmt.Sprintf("\t\tcase %s = \"%s\"\n", toCamelCase(tag), tag)
 		}
 

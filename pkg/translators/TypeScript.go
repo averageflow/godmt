@@ -46,22 +46,22 @@ func (t *TypeScriptTranslator) Translate() string {
 			result += fmt.Sprintf(
 				"export const %s: %s = %s;\n\n",
 				entity.Name,
-				getTypescriptCompatibleType(entity.Kind),
+				GetTypescriptCompatibleType(entity.Kind),
 				entity.Value,
 			)
 		case godmt.MapType:
 			result += fmt.Sprintf(
 				"export const %s: %s = {\n",
 				entity.Name,
-				getRecordType(entity.Kind),
+				GetRecordType(entity.Kind),
 			)
-			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
+			result += fmt.Sprintf("%s\n", MapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
 			result += "};\n\n"
 		case godmt.SliceType:
 			result += fmt.Sprintf(
 				"export const %s: %s = [\n",
 				entity.Name,
-				transformSliceTypeToTypeScript(entity.Kind),
+				TransformSliceTypeToTypeScript(entity.Kind),
 			)
 			result += fmt.Sprintf("%s\n", godmt.SliceValuesToPrettyList(entity.Value.([]string)))
 			result += "];\n\n"
@@ -73,7 +73,7 @@ func (t *TypeScriptTranslator) Translate() string {
 
 		entity := t.Data.StructScanResult[t.Data.StructSort[i]]
 		for j := range entity.Fields {
-			if isEmbeddedStructForInheritance(&entity.Fields[j]) {
+			if IsEmbeddedStructForInheritance(&entity.Fields[j]) {
 				extendsClasses = append(extendsClasses, entity.Fields[j].Name)
 			}
 		}
@@ -87,7 +87,7 @@ func (t *TypeScriptTranslator) Translate() string {
 
 		for j := range entity.Fields {
 			entityField := entity.Fields[j]
-			if isEmbeddedStructForInheritance(&entityField) {
+			if IsEmbeddedStructForInheritance(&entityField) {
 				continue
 			}
 
@@ -102,7 +102,7 @@ func (t *TypeScriptTranslator) Translate() string {
 				}
 			}
 
-			result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), getTypescriptCompatibleType(entityField.Kind))
+			result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), GetTypescriptCompatibleType(entityField.Kind))
 
 			if entityField.ImportDetails != nil {
 				imports += fmt.Sprintf(
