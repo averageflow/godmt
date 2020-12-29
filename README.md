@@ -1,7 +1,3 @@
-<p align="center">
-  <img width="250" height="150" src="web/DMT.png">
-</p>
-
 # GoDMT
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/averageflow/godmt)](https://goreportcard.com/report/github.com/averageflow/godmt)
@@ -12,6 +8,10 @@
 [![License](https://img.shields.io/github/license/averageflow/godmt.svg)](https://github.com/averageflow/godmt/blob/master/LICENSE.md)
 
 GoDMT, the one and only Go Data Model Translator. The goal of this project is to provide a tool that can parse Go files that include `var`, `const`, `map`, `struct` and `type` into an abstract syntax tree, aka AST.
+
+<p align="center">
+  <img width="250" height="150" src="web/DMT.png">
+</p>
 
 That AST will then be transformed into data models for several programming languages. Some small adjustments may need to be made to integrate the output into a project, but this should already save you a lot of time and hassle, and will help you stay in sync with the Go version of your data models, in other languages.
 
