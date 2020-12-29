@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/godmt"
 )
 
 type visitor int
@@ -22,8 +22,8 @@ func WalkSyntaxTree(f *ast.File) {
 
 type FileResult struct {
 	ConstantSort     []string
-	ScanResult       map[string]syntaxtreeparser.ScannedType
-	StructScanResult map[string]syntaxtreeparser.ScannedStruct
+	ScanResult       map[string]godmt.ScannedType
+	StructScanResult map[string]godmt.ScannedStruct
 	StructSort       []string
 }
 
@@ -113,8 +113,8 @@ func ScanDir(path string, info os.FileInfo, err error) error {
 	CurrentFile = path
 	currentResult := Result[path]
 
-	currentResult.StructScanResult = make(map[string]syntaxtreeparser.ScannedStruct)
-	currentResult.ScanResult = make(map[string]syntaxtreeparser.ScannedType)
+	currentResult.StructScanResult = make(map[string]godmt.ScannedStruct)
+	currentResult.ScanResult = make(map[string]godmt.ScannedType)
 
 	Result[path] = currentResult
 

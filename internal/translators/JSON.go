@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/godmt"
 )
 
 type jsonFinalResult struct {
-	Enums map[string]syntaxtreeparser.ScannedType   `json:"enums"`
-	Types map[string]syntaxtreeparser.ScannedStruct `json:"types"`
+	Enums map[string]godmt.ScannedType   `json:"enums"`
+	Types map[string]godmt.ScannedStruct `json:"types"`
 }
 
 type JSONTranslator struct {
@@ -17,12 +17,6 @@ type JSONTranslator struct {
 }
 
 func (t *JSONTranslator) Translate() string {
-	fmt.Println(`
-----------------------------------
-Performing JSON translation!
-----------------------------------
-	`)
-
 	payload := jsonFinalResult{
 		Enums: t.Data.ScanResult,
 		Types: t.Data.StructScanResult,

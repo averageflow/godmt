@@ -1,4 +1,4 @@
-package syntaxtreeparser
+package godmt
 
 // The below constants represent the InternalType for a scanned type
 // this is used in the translators to determine more easily the type of object we are

@@ -1,15 +1,14 @@
 package syntaxtree
 
 import (
-	"fmt"
 	"go/ast"
 	"reflect"
 
-	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/godmt"
 )
 
-func parseStruct(d *ast.Ident) []syntaxtreeparser.ScannedStruct {
-	var result []syntaxtreeparser.ScannedStruct
+func parseStruct(d *ast.Ident) []godmt.ScannedStruct {
+	var result []godmt.ScannedStruct
 
 	structTypes := reflect.ValueOf(d.Obj.Decl).Elem().FieldByName("Type")
 	if !structTypes.IsValid() {
@@ -21,34 +20,34 @@ func parseStruct(d *ast.Ident) []syntaxtreeparser.ScannedStruct {
 		fields := structTypes.Interface().(*ast.StructType)
 		fieldList := fields.Fields.List
 
-		var rawScannedFields []syntaxtreeparser.ScannedStructField
+		var rawScannedFields []godmt.ScannedStructField
 
 		for i := range fieldList {
 			switch fieldList[i].Type.(type) {
 			case *ast.Ident:
-				parsed := syntaxtreeparser.SimpleStructFieldParser(fieldList[i])
+				parsed := godmt.SimpleStructFieldParser(fieldList[i])
 				rawScannedFields = append(rawScannedFields, parsed)
 			case *ast.StructType:
-				fmt.Println("TODO: Support nested structs!")
+				//fmt.Println("TODO: Support nested structs!")
 				break
 			case *ast.SelectorExpr:
-				parsed := syntaxtreeparser.ImportedStructFieldParser(fieldList[i])
+				parsed := godmt.ImportedStructFieldParser(fieldList[i])
 				rawScannedFields = append(rawScannedFields, parsed)
 			}
 		}
-		result = append(result, syntaxtreeparser.ScannedStruct{
+		result = append(result, godmt.ScannedStruct{
 			Doc:          nil,
 			Name:         d.Name,
 			Fields:       rawScannedFields,
-			InternalType: syntaxtreeparser.StructType,
+			InternalType: godmt.StructType,
 		})
 	}
 
 	return result
 }
 
-func parseConstantsAndVariables(d *ast.Ident) []syntaxtreeparser.ScannedType {
-	var result []syntaxtreeparser.ScannedType
+func parseConstantsAndVariables(d *ast.Ident) []godmt.ScannedType {
+	var result []godmt.ScannedType
 
 	objectValues := reflect.ValueOf(d.Obj.Decl).Elem().FieldByName("Values")
 	if !objectValues.IsValid() {
@@ -61,12 +60,12 @@ func parseConstantsAndVariables(d *ast.Ident) []syntaxtreeparser.ScannedType {
 		switch values[i].(type) {
 		case *ast.BasicLit:
 			item := values[i].(*ast.BasicLit)
-			parsed := syntaxtreeparser.BasicTypeLiteralParser(d, item)
+			parsed := godmt.BasicTypeLiteralParser(d, item)
 			result = append(result, parsed)
 
 		case *ast.Ident:
 			item := values[i].(*ast.Ident)
-			parsed := syntaxtreeparser.IdentifierParser(d, item)
+			parsed := godmt.IdentifierParser(d, item)
 			if parsed != nil {
 				result = append(result, *parsed)
 			}
@@ -76,11 +75,11 @@ func parseConstantsAndVariables(d *ast.Ident) []syntaxtreeparser.ScannedType {
 			switch item.Type.(type) {
 			case *ast.MapType:
 				mapElements := reflect.ValueOf(item.Elts).Interface().([]ast.Expr)
-				parsed := syntaxtreeparser.CompositeLiteralMapParser(d, mapElements, item)
+				parsed := godmt.CompositeLiteralMapParser(d, mapElements, item)
 				result = append(result, parsed)
 			case *ast.ArrayType:
-				sliceType := syntaxtreeparser.GetMapValueType(item.Type.(*ast.ArrayType).Elt)
-				parsed := syntaxtreeparser.CompositeLiteralSliceParser(d, sliceType, item)
+				sliceType := godmt.GetMapValueType(item.Type.(*ast.ArrayType).Elt)
+				parsed := godmt.CompositeLiteralSliceParser(d, sliceType, item)
 				result = append(result, parsed)
 			}
 		}

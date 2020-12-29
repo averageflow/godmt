@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/godmt"
 )
 
 var goTypeScriptTypeMappings = map[string]string{
@@ -29,12 +29,6 @@ type TypeScriptTranslator struct {
 }
 
 func (t *TypeScriptTranslator) Translate() string {
-	fmt.Println(`
-----------------------------------
-Performing TypeScript translation!
-----------------------------------
-	`)
-
 	var imports string
 	var result string
 
@@ -47,14 +41,14 @@ Performing TypeScript translation!
 		}
 
 		switch entity.InternalType {
-		case syntaxtreeparser.ConstType:
+		case godmt.ConstType:
 			result += fmt.Sprintf(
 				"export const %s: %s = %s;\n\n",
 				entity.Name,
 				getTypescriptCompatibleType(entity.Kind),
 				entity.Value,
 			)
-		case syntaxtreeparser.MapType:
+		case godmt.MapType:
 			result += fmt.Sprintf(
 				"export const %s: %s = {\n",
 				entity.Name,
@@ -62,13 +56,13 @@ Performing TypeScript translation!
 			)
 			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
 			result += fmt.Sprint("};\n\n")
-		case syntaxtreeparser.SliceType:
+		case godmt.SliceType:
 			result += fmt.Sprintf(
 				"export const %s: %s = [\n",
 				entity.Name,
 				transformSliceTypeToTypeScript(entity.Kind),
 			)
-			result += fmt.Sprintf("%s\n", syntaxtreeparser.SliceValuesToPrettyList(entity.Value.([]string)))
+			result += fmt.Sprintf("%s\n", godmt.SliceValuesToPrettyList(entity.Value.([]string)))
 			result += fmt.Sprint("];\n\n")
 		}
 	}
@@ -96,7 +90,7 @@ Performing TypeScript translation!
 				continue
 			}
 
-			tag := syntaxtreeparser.CleanTagName(entityField.Tag)
+			tag := godmt.CleanTagName(entityField.Tag)
 			if tag == "" || t.Preserve {
 				tag = entityField.Name
 			}

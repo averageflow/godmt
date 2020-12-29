@@ -2,7 +2,7 @@ package translators
 
 import (
 	"github.com/averageflow/godmt/internal/syntaxtree"
-	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/godmt"
 )
 
 const (
@@ -19,5 +19,5 @@ type Translator struct {
 
 type TypeTranslator interface {
 	Translate() string
-	Setup(d []syntaxtreeparser.ScannedType)
+	Setup(d []godmt.ScannedType)
 }

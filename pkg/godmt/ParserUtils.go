@@ -1,4 +1,4 @@
-package syntaxtreeparser
+package godmt
 
 import (
 	"fmt"

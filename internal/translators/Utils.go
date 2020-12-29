@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/godmt"
 
 	"github.com/iancoleman/strcase"
 )
 
-func isEmbeddedStructForInheritance(field syntaxtreeparser.ScannedStructField) bool {
+func isEmbeddedStructForInheritance(field godmt.ScannedStructField) bool {
 	return field.Kind == "struct" && field.Tag == ""
 }
 

@@ -3,7 +3,7 @@ package translators
 import (
 	"fmt"
 
-	"github.com/averageflow/godmt/pkg/syntaxtreeparser"
+	"github.com/averageflow/godmt/pkg/godmt"
 )
 
 var goSwiftTypeMappings = map[string]string{
@@ -28,12 +28,6 @@ type SwiftTranslator struct {
 }
 
 func (t *SwiftTranslator) Translate() string {
-	fmt.Println(`
-----------------------------------
-Performing Swift translation!
-----------------------------------
-	`)
-
 	var result string
 
 	for i := range t.Data.ConstantSort {
@@ -45,14 +39,14 @@ Performing Swift translation!
 		}
 
 		switch entity.InternalType {
-		case syntaxtreeparser.ConstType:
+		case godmt.ConstType:
 			result += fmt.Sprintf(
 				"let %s: %s = %s\n\n",
 				entity.Name,
 				getSwiftCompatibleType(entity.Kind),
 				entity.Value,
 			)
-		case syntaxtreeparser.MapType:
+		case godmt.MapType:
 			result += fmt.Sprintf(
 				"let %s: %s = [\n",
 				entity.Name,
@@ -60,20 +54,20 @@ Performing Swift translation!
 			)
 			result += fmt.Sprintf("%s\n", mapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
 			result += fmt.Sprint("]\n\n")
-		case syntaxtreeparser.SliceType:
+		case godmt.SliceType:
 			result += fmt.Sprintf(
 				"var %s: %s = [\n",
 				entity.Name,
 				transformSliceTypeToSwift(entity.Kind),
 			)
-			result += fmt.Sprintf("%s\n", syntaxtreeparser.SliceValuesToPrettyList(entity.Value.([]string)))
+			result += fmt.Sprintf("%s\n", godmt.SliceValuesToPrettyList(entity.Value.([]string)))
 			result += fmt.Sprint("];\n\n")
 		}
 	}
 
 	for i := range t.Data.StructSort {
 		var extendsClasses []string
-		var inheritedFields []syntaxtreeparser.ScannedStructField
+		var inheritedFields []godmt.ScannedStructField
 
 		entity := t.Data.StructScanResult[t.Data.StructSort[i]]
 
@@ -99,7 +93,7 @@ Performing Swift translation!
 				continue
 			}
 
-			tag := syntaxtreeparser.CleanTagName(entityField.Tag)
+			tag := godmt.CleanTagName(entityField.Tag)
 			if tag == "" || t.Preserve {
 				tag = entityField.Name
 			}
