@@ -102,7 +102,20 @@ func (t *SwiftTranslator) Translate() string {
 				}
 			}
 
-			result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), GetSwiftCompatibleType(entityField.Kind))
+			if len(entityField.SubFields) > 0 {
+				result += fmt.Sprintf("\tstruct %s {\n", quoteWhenNeeded(tag))
+				for k := range entityField.SubFields {
+					subtag := godmt.CleanTagName(entityField.SubFields[k].Tag)
+					if subtag == "" || t.Preserve {
+						subtag = entityField.SubFields[k].Name
+					}
+					result += fmt.Sprintf("\t\tvar %s: %s;\n", quoteWhenNeeded(subtag), GetSwiftCompatibleType(entityField.SubFields[k].Kind))
+				}
+				result += "\t}\n"
+			} else {
+				result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), GetSwiftCompatibleType(entityField.Kind))
+			}
+
 			structExtension += fmt.Sprintf("\t\tcase %s = \"%s\"\n", toCamelCase(tag), tag)
 		}
 

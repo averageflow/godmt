@@ -102,7 +102,19 @@ func (t *TypeScriptTranslator) Translate() string {
 				}
 			}
 
-			result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), GetTypescriptCompatibleType(entityField.Kind))
+			if len(entityField.SubFields) > 0 {
+				result += fmt.Sprintf("\t%s: {\n", quoteWhenNeeded(tag))
+				for k := range entityField.SubFields {
+					subtag := godmt.CleanTagName(entityField.SubFields[k].Tag)
+					if subtag == "" || t.Preserve {
+						subtag = entityField.SubFields[k].Name
+					}
+					result += fmt.Sprintf("\t\t%s: %s;\n", quoteWhenNeeded(subtag), GetTypescriptCompatibleType(entityField.SubFields[k].Kind))
+				}
+				result += "\t}\n"
+			} else {
+				result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), GetTypescriptCompatibleType(entityField.Kind))
+			}
 
 			if entityField.ImportDetails != nil {
 				imports += fmt.Sprintf(

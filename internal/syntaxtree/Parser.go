@@ -61,7 +61,10 @@ func parseNestedStruct(field *ast.Field) *godmt.ScannedStructField {
 	var parsedNestedFields []godmt.ScannedStructField
 
 	for i := range nestedFields.List {
-		parseStructField(nestedFields.List[i])
+		parsedField := parseStructField(nestedFields.List[i])
+		if parsedField != nil {
+			parsedNestedFields = append(parsedNestedFields, *parsedField)
+		}
 	}
 
 	tag := field.Tag
