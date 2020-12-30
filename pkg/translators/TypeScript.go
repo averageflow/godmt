@@ -53,7 +53,7 @@ func (t *TypeScriptTranslator) Translate() string { //nolint:gocognit,gocyclo
 			result += fmt.Sprintf(
 				"export const %s: %s = {\n",
 				entity.Name,
-				GetRecordType(TypeScriptTranslationMode, entity.Kind),
+				TransformTypeScriptRecord(entity.Kind),
 			)
 			result += fmt.Sprintf("%s\n", MapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
 			result += "};\n\n"
@@ -118,7 +118,7 @@ func (t *TypeScriptTranslator) Translate() string { //nolint:gocognit,gocyclo
 			} else {
 				switch entityField.InternalType {
 				case godmt.MapType:
-					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), GetRecordType(TypeScriptTranslationMode, entityField.Kind))
+					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), TransformTypeScriptRecord(entityField.Kind))
 				case godmt.SliceType:
 					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), TransformSliceTypeToTypeScript(entityField.Kind))
 				default:
