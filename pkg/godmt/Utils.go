@@ -3,6 +3,7 @@ package godmt
 import (
 	"fmt"
 	"go/ast"
+	"regexp"
 	"strings"
 )
 
@@ -63,22 +64,36 @@ func SliceValuesToPrettyList(raw []string) string {
 }
 
 func CleanTagName(rawTagName string) string {
-	replacePatterns := []string{
-		",string",
-		"`json:\"",
-		"`form:\"",
-		"\" binding:\"",
-		"`uri:\"",
-		",omitempty",
-		"\"`",
-		`binding:"required"`,
+	jsonRegex := regexp.MustCompile(`(?m)json:"[^"]+"`)
+	xmlRegex := regexp.MustCompile(`(?m)xml:"[^"]+"`)
+
+	var jsonTagName []string
+	var xmlTagName []string
+
+	// By default use JSON tag name
+	for _, match := range jsonRegex.FindAllString(rawTagName, -1) {
+		name := strings.TrimSpace(match)
+		name = strings.ReplaceAll(name, `json:"`, ``)
+		name = strings.ReplaceAll(name, `"`, ``)
+		jsonTagName = append(jsonTagName, name)
 	}
 
-	result := rawTagName
-
-	for i := range replacePatterns {
-		result = strings.ReplaceAll(result, replacePatterns[i], "")
+	if len(jsonTagName) > 0 {
+		return strings.Join(jsonTagName, "")
 	}
 
-	return strings.TrimSpace(result)
+	// Alternatively use XML tag name
+	for _, match := range xmlRegex.FindAllString(rawTagName, -1) {
+		name := strings.TrimSpace(match)
+		name = strings.ReplaceAll(name, `xml:"`, ``)
+		name = strings.ReplaceAll(name, `"`, ``)
+		xmlTagName = append(xmlTagName, name)
+	}
+
+	if len(xmlTagName) > 0 {
+		return strings.Join(xmlTagName, "")
+	}
+
+	// Fallback to the raw tag
+	return rawTagName
 }

@@ -100,7 +100,7 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo
 			}
 		}
 
-		result += fmt.Sprintf("\nexport interface %s", entity.Name)
+		result += fmt.Sprintf("\nclass %s", entity.Name)
 		if len(extendsClasses) > 0 {
 			result += fmt.Sprintf(" extends %s", strings.Join(extendsClasses, ", "))
 		}
@@ -138,7 +138,7 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo
 
 				result += "\t}\n"
 			} else {
-				result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), GetTypescriptCompatibleType(entityField.Kind))
+				result += fmt.Sprintf("\tprotected %s $%s;\n", GetPHPCompatibleType(entityField.Kind), tag)
 			}
 
 			if entityField.ImportDetails != nil {
