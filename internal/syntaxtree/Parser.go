@@ -44,7 +44,7 @@ func parseStruct(d *ast.Ident) []godmt.ScannedStruct {
 }
 
 func parseStructField(item *ast.Field) *godmt.ScannedStructField {
-	switch item.Type.(type) {
+	switch item.Type.(type) { //nolint:gocritic
 	case *ast.Ident:
 		return godmt.SimpleStructFieldParser(item)
 	case *ast.StructType:
@@ -55,6 +55,23 @@ func parseStructField(item *ast.Field) *godmt.ScannedStructField {
 		return godmt.SimpleStructFieldParser(item)
 	case *ast.ArrayType:
 		return parseComplexStructField(item.Names[0])
+	case *ast.StarExpr:
+		pointer := item.Type.(*ast.StarExpr).X
+		switch value := pointer.(type) {
+		// case *ast.ArrayType: // FUTURE: do array and map pointers
+		case *ast.Ident:
+			return &godmt.ScannedStructField{
+				Doc:          godmt.ExtractComments(item.Doc),
+				Name:         item.Names[0].Name,
+				Kind:         value.Name,
+				Tag:          item.Tag.Value,
+				InternalType: godmt.VarType,
+				IsPointer:    true,
+			}
+
+		default:
+			return nil
+		}
 	default:
 		return nil
 	}

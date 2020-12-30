@@ -46,7 +46,7 @@ func (t *TypeScriptTranslator) Translate() string { //nolint:gocognit,gocyclo
 			result += fmt.Sprintf(
 				"export const %s: %s = %s;\n\n",
 				entity.Name,
-				GetTypescriptCompatibleType(entity.Kind),
+				GetTypescriptCompatibleType(entity.Kind, false),
 				entity.Value,
 			)
 		case godmt.MapType:
@@ -111,7 +111,10 @@ func (t *TypeScriptTranslator) Translate() string { //nolint:gocognit,gocyclo
 						subtag = entityField.SubFields[k].Name
 					}
 
-					result += fmt.Sprintf("\t\t%s: %s;\n", quoteWhenNeeded(subtag), GetTypescriptCompatibleType(entityField.SubFields[k].Kind))
+					result += fmt.Sprintf("\t\t%s: %s;\n",
+						quoteWhenNeeded(subtag),
+						GetTypescriptCompatibleType(entityField.SubFields[k].Kind, entityField.SubFields[k].IsPointer),
+					)
 				}
 
 				result += "\t}\n"
@@ -122,7 +125,7 @@ func (t *TypeScriptTranslator) Translate() string { //nolint:gocognit,gocyclo
 				case godmt.SliceType:
 					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), TransformSliceTypeToTypeScript(entityField.Kind))
 				default:
-					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), GetTypescriptCompatibleType(entityField.Kind))
+					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), GetTypescriptCompatibleType(entityField.Kind, entityField.IsPointer))
 				}
 			}
 

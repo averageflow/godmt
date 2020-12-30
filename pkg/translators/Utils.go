@@ -14,10 +14,14 @@ func IsEmbeddedStructForInheritance(field *godmt.ScannedStructField) bool {
 	return field.Kind == "struct" && field.Tag == ""
 }
 
-func GetTypescriptCompatibleType(goType string) string {
+func GetTypescriptCompatibleType(goType string, isPointer bool) string {
 	result, ok := goTypeScriptTypeMappings[goType]
 	if !ok {
-		return goType
+		return fmt.Sprintf("%s | null", goType)
+	}
+
+	if isPointer {
+		return fmt.Sprintf("%s | null", result)
 	}
 
 	return result
@@ -62,20 +66,20 @@ func TransformTypeScriptRecord(goMapType string) string {
 			cleanMatch := strings.ReplaceAll(match, "[]map[", "")
 			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
 
-			types = append(types, ScannedRecordItem{Kind: GetTypescriptCompatibleType(cleanMatch), IsMapSlice: true})
+			types = append(types, ScannedRecordItem{Kind: GetTypescriptCompatibleType(cleanMatch, false), IsMapSlice: true})
 		} else {
 			lastType.Kind = strings.ReplaceAll(lastType.Kind, match, "")
 			cleanMatch := strings.ReplaceAll(match, "map[", "")
 			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
 
-			types = append(types, ScannedRecordItem{Kind: GetTypescriptCompatibleType(cleanMatch)})
+			types = append(types, ScannedRecordItem{Kind: GetTypescriptCompatibleType(cleanMatch, false)})
 		}
 	}
 
 	if strings.HasPrefix(lastType.Kind, "[]") {
 		lastType.Kind = TransformSliceTypeToTypeScript(lastType.Kind)
 	} else {
-		lastType.Kind = GetTypescriptCompatibleType(lastType.Kind)
+		lastType.Kind = GetTypescriptCompatibleType(lastType.Kind, false)
 	}
 
 	var result string
@@ -185,7 +189,7 @@ func TransformSliceTypeToTypeScript(rawSliceType string) string {
 		return fmt.Sprintf("%s[]", TransformTypeScriptRecord(result))
 	}
 
-	return fmt.Sprintf("%s[]", GetTypescriptCompatibleType(result))
+	return fmt.Sprintf("%s[]", GetTypescriptCompatibleType(result, false))
 }
 
 func TransformSliceTypeToPHP(rawSliceType string) string {

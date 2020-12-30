@@ -37,6 +37,7 @@ type ScannedStructField struct {
 	ImportDetails *ImportedEntityDetails `json:"importedEntity"`
 	SubFields     []ScannedStructField   `json:"subFields"`
 	InternalType  int                    `json:"internalType"`
+	IsPointer     bool                   `json:"isPointer"`
 }
 
 // ScannedStruct represents the details of a scanned struct.
