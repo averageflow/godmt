@@ -10,6 +10,7 @@ const (
 	TSTranslationMode         = "ts"
 	SwiftTranslationMode      = "swift"
 	JSONTranslationMode       = "json"
+	PHPTranslationMode        = "php"
 )
 
 const (

@@ -38,7 +38,14 @@ func GetMapValueType(item ast.Expr) string {
 func ExtractSliceValues(items []ast.Expr) []string {
 	result := make([]string, len(items))
 	for i := range items {
-		result[i] = items[i].(*ast.BasicLit).Value
+		switch item := items[i].(type) {
+		case *ast.BasicLit:
+			result[i] = item.Value
+		case *ast.Ident:
+			result[i] = item.Name
+		default:
+			break
+		}
 	}
 
 	return result

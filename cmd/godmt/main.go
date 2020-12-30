@@ -71,7 +71,12 @@ func main() {
 				Translator: baseTranslator,
 			}
 			resultingOutput = s.Translate()
-
+		case translators.PHPTranslationMode:
+			filename = strings.ReplaceAll(filename, ".go", ".php")
+			s := translators.PHPTranslator{
+				Translator: baseTranslator,
+			}
+			resultingOutput = s.Translate()
 		default:
 			filename = strings.ReplaceAll(filename, ".go", ".json")
 			j := translators.JSONTranslator{

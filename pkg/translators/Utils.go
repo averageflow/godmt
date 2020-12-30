@@ -22,6 +22,15 @@ func GetTypescriptCompatibleType(goType string) string {
 	return result
 }
 
+func GetPHPCompatibleType(goType string) string {
+	result, ok := goPHPTypeMappings[goType]
+	if !ok {
+		return goType
+	}
+
+	return result
+}
+
 func GetSwiftCompatibleType(goType string) string {
 	result, ok := goSwiftTypeMappings[goType]
 	if !ok {
@@ -70,9 +79,26 @@ func MapValuesToTypeScriptRecord(rawMap map[string]string) string {
 	return strings.Join(entries, ",\n")
 }
 
+func MapValuesToPHPArray(rawMap map[string]string) string {
+	var entries []string //nolint:prealloc
+	for i := range rawMap {
+		entries = append(entries, fmt.Sprintf("\t%s => %s", i, rawMap[i]))
+	}
+
+	return strings.Join(entries, ",\n")
+}
+
 func TransformSliceTypeToTypeScript(rawSliceType string) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
 	return fmt.Sprintf("%s[]", GetTypescriptCompatibleType(result))
+}
+
+func TransformSliceTypeToPHP(rawSliceType string) string {
+	result := strings.ReplaceAll(rawSliceType, "[]", "")
+	if result == "interface{}" {
+		return "array"
+	}
+	return fmt.Sprintf("%s[]", GetPHPCompatibleType(result))
 }
 
 func TransformSliceTypeToSwift(rawSliceType string) string {
