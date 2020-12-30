@@ -22,3 +22,10 @@ type ScannedStruct struct {
 	Fields       []bool   `json:"fields" binding:"required" validation:"required"`
 	InternalType int      `xml:"internalType" binding:"required" validation:"required"`
 }
+
+type EmbeddedType struct {
+	ID   string `json:"id"`
+	Data struct {
+		Test string `json:"test"`
+	} `json:"data"`
+}

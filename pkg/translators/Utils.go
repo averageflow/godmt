@@ -98,6 +98,7 @@ func TransformSliceTypeToPHP(rawSliceType string) string {
 	if result == "interface{}" {
 		return "array"
 	}
+
 	return fmt.Sprintf("%s[]", GetPHPCompatibleType(result))
 }
 

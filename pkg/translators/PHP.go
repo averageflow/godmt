@@ -28,7 +28,7 @@ type PHPTranslator struct {
 	Translator
 }
 
-func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo
+func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo,funlen
 	var imports string
 
 	result := "<?php\n\n"
@@ -38,12 +38,14 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo
 
 		switch entity.InternalType {
 		case godmt.ConstType:
-			result += "/**\n"
+			result += "/**\n" //nolint:goconst
+
 			if len(entity.Doc) > 0 {
 				for j := range entity.Doc {
 					result += fmt.Sprintf(" * %s\n", strings.ReplaceAll(entity.Doc[j], "// ", ""))
 				}
 			}
+
 			result += fmt.Sprintf(
 				" * @const %s %s\n */\n",
 				entity.Name,
@@ -56,25 +58,29 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo
 			)
 		case godmt.MapType:
 			result += "/**\n"
+
 			if len(entity.Doc) > 0 {
 				for j := range entity.Doc {
 					result += fmt.Sprintf(" * %s\n", strings.ReplaceAll(entity.Doc[j], "// ", ""))
 				}
 			}
+
 			result += fmt.Sprintf(" * @const array %s\n */\n", entity.Name)
 			result += fmt.Sprintf(
 				"const %s = [\n",
 				entity.Name,
 			)
 			result += fmt.Sprintf("%s\n", MapValuesToPHPArray(entity.Value.(map[string]string)))
-			result += "];\n\n"
+			result += "];\n\n" //nolint:goconst
 		case godmt.SliceType:
 			result += "/**\n"
+
 			if len(entity.Doc) > 0 {
 				for j := range entity.Doc {
 					result += fmt.Sprintf(" * %s\n", strings.ReplaceAll(entity.Doc[j], "// ", ""))
 				}
 			}
+
 			result += fmt.Sprintf(
 				" * @const %s %s\n */\n",
 				TransformSliceTypeToPHP(entity.Kind),
@@ -105,7 +111,7 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo
 			result += fmt.Sprintf(" extends %s", strings.Join(extendsClasses, ", "))
 		}
 
-		result += " {\n"
+		result += " {\n" //nolint:goconst
 
 		for j := range entity.Fields {
 			entityField := entity.Fields[j]
@@ -124,21 +130,9 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo
 				}
 			}
 
-			if len(entityField.SubFields) > 0 {
-				result += fmt.Sprintf("\t%s: {\n", quoteWhenNeeded(tag))
-
-				for k := range entityField.SubFields {
-					subtag := godmt.CleanTagName(entityField.SubFields[k].Tag)
-					if subtag == "" || t.Preserve {
-						subtag = entityField.SubFields[k].Name
-					}
-
-					result += fmt.Sprintf("\t\t%s: %s;\n", quoteWhenNeeded(subtag), GetTypescriptCompatibleType(entityField.SubFields[k].Kind))
-				}
-
-				result += "\t}\n"
-			} else {
-				result += fmt.Sprintf("\tprotected %s $%s;\n", GetPHPCompatibleType(entityField.Kind), tag)
+			if len(entityField.SubFields) == 0 {
+				// Future: Support subfields (nested structs)
+				result += fmt.Sprintf("\tpublic %s $%s;\n", GetPHPCompatibleType(entityField.Kind), tag)
 			}
 
 			if entityField.ImportDetails != nil {
@@ -150,7 +144,22 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo
 			}
 		}
 
-		result += "}\n"
+		result += "\n\tpublic function __construct(array $data) {\n"
+
+		for j := range entity.Fields {
+			if IsEmbeddedStructForInheritance(&entity.Fields[j]) {
+				continue
+			}
+
+			tag := godmt.CleanTagName(entity.Fields[j].Tag)
+			if tag == "" || t.Preserve {
+				tag = entity.Fields[j].Name
+			}
+
+			result += fmt.Sprintf("\t\t$this->%s = $data['%s'];\n", tag, tag)
+		}
+
+		result += "\t}\n}\n"
 	}
 
 	if imports != "" {

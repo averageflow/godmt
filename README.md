@@ -25,6 +25,14 @@ Currently, the supported operating systems are all of UNIX family:
 - BSD
 - macOS
 
+## Talk is cheap, show code
+
+Feel free to browse some examples that I am happy to provide here:
+- [Constants](examples/Constants.md)
+- [Maps](examples/Constants.md)
+- [Slices](examples/Constants.md)
+- [Structs](examples/Constants.md)
+
 ## Usage
 
 ```
@@ -38,6 +46,7 @@ go run main.go -dir={scanDirectory} -translation={language} -preserve -tree
     - `ts` or `typescript` for TypeScript conversion
     - `swift` for Swift conversion
     - `json` for JSON conversion
+    - `php` for PHP conversion
 - `preserve` is an optional boolean flag which will make the output structs preserve the original names, instead of
   using the (`json:"tag"`).
 - `tree` is an optional boolean that when present will prevent any file operations being performed, and instead will
@@ -52,9 +61,7 @@ go run main.go -dir=../../tests/data/ -translation=ts
 After a successful run, the program will output a `result` folder in the current working directory with subfolders for
 respective scanned packages. Filenames will be respected and maintained, with only changes to the extension.
 
-## Talk is cheap, show code
 
-Feel free to browse some [examples that I am happy to provide here](examples/Conversions.md).
 
 ## Building
 

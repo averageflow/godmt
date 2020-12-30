@@ -38,6 +38,7 @@ func GetMapValueType(item ast.Expr) string {
 // of a []string for ease of use.
 func ExtractSliceValues(items []ast.Expr) []string {
 	result := make([]string, len(items))
+
 	for i := range items {
 		switch item := items[i].(type) {
 		case *ast.BasicLit:
@@ -67,8 +68,9 @@ func CleanTagName(rawTagName string) string {
 	jsonRegex := regexp.MustCompile(`(?m)json:"[^"]+"`)
 	xmlRegex := regexp.MustCompile(`(?m)xml:"[^"]+"`)
 
-	var jsonTagName []string
-	var xmlTagName []string
+	var jsonTagName []string //nolint:prealloc
+
+	var xmlTagName []string //nolint:prealloc
 
 	// By default use JSON tag name
 	for _, match := range jsonRegex.FindAllString(rawTagName, -1) {
