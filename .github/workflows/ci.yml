@@ -18,7 +18,6 @@ jobs:
         env:
           CODECOV_TOKEN: 46a1b90c-0fe3-4cbc-87c6-cef958691f99
         run: |
+          cd cmd/godmt && go build && cd ../../
           go test -v -coverprofile=coverage.out ./...
           curl -s https://codecov.io/bash | bash
-          cd cmd/godmt
-          go build
