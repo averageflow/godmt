@@ -29,10 +29,11 @@ Currently, the supported operating systems are all of UNIX family:
 ## Talk is cheap, show code
 
 Feel free to browse some examples that I am happy to provide here:
+- [Complex Structures](examples/ComplexStructures.md)
 - [Constants](examples/Constants.md)
-- [Maps](examples/Constants.md)
-- [Slices](examples/Constants.md)
-- [Structs](examples/Constants.md)
+- [Maps](examples/Maps.md)
+- [Slices](examples/Slices.md)
+- [Structs](examples/Structs.md)
 
 ## Usage
 
