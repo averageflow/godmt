@@ -2,6 +2,7 @@ package translators
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/averageflow/godmt/pkg/godmt"
@@ -40,34 +41,45 @@ func GetSwiftCompatibleType(goType string) string {
 	return result
 }
 
-func GetRecordType(goMapType string) string {
-	var result string
+func GetRecordType(language string, goMapType string) string {
+	var recordType string
 
-	result = strings.ReplaceAll(goMapType, "map[", "")
-	recordTypes := strings.Split(result, "]")
-
-	for i := range recordTypes {
-		recordTypes[i] = GetTypescriptCompatibleType(recordTypes[i])
+	if language == SwiftTranslationMode {
+		recordType = "Dictionary"
+	} else if language == TypeScriptTranslationMode {
+		recordType = "Record"
 	}
 
-	result = strings.Join(recordTypes, ", ")
+	var re = regexp.MustCompile(`(?m)map\[[^]^[]+]`)
 
-	return fmt.Sprintf("Record<%s>", result)
-}
+	var types []string
 
-func GetDictionaryType(goMapType string) string {
-	var result string
-
-	result = strings.ReplaceAll(goMapType, "map[", "")
-	recordTypes := strings.Split(result, "]")
-
-	for i := range recordTypes {
-		recordTypes[i] = GetSwiftCompatibleType(recordTypes[i])
+	for _, match := range re.FindAllString(goMapType, -1) {
+		cleanMatch := strings.ReplaceAll(match, "map[", "")
+		cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
+		if language == SwiftTranslationMode {
+			types = append(types, GetSwiftCompatibleType(cleanMatch))
+		} else if language == TypeScriptTranslationMode {
+			types = append(types, GetTypescriptCompatibleType(cleanMatch))
+		}
 	}
 
-	result = strings.Join(recordTypes, ", ")
+	typeSplit := strings.Split(goMapType, "]")
+	lastType := typeSplit[len(typeSplit)-1]
+	if language == SwiftTranslationMode {
+		lastType = GetSwiftCompatibleType(lastType)
+	} else if language == TypeScriptTranslationMode {
+		lastType = GetTypescriptCompatibleType(lastType)
+	}
 
-	return fmt.Sprintf("Dictionary<%s>", result)
+	switch len(types) {
+	case 3:
+		return fmt.Sprintf("%s<%s, %s<%s, %s<%s, %s>>>", recordType, types[0], recordType, types[1], recordType, types[2], lastType)
+	case 2:
+		return fmt.Sprintf("%s<%s, %s<%s, %s>>", recordType, types[0], recordType, types[1], lastType)
+	default:
+		return fmt.Sprintf("%s<%s, %s>", recordType, types[0], lastType)
+	}
 }
 
 func MapValuesToTypeScriptRecord(rawMap map[string]string) string {
@@ -90,12 +102,15 @@ func MapValuesToPHPArray(rawMap map[string]string) string {
 
 func TransformSliceTypeToTypeScript(rawSliceType string) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
+	if strings.Contains(result, "map") {
+		return fmt.Sprintf("%s[]", GetRecordType(TypeScriptTranslationMode, result))
+	}
 	return fmt.Sprintf("%s[]", GetTypescriptCompatibleType(result))
 }
 
 func TransformSliceTypeToPHP(rawSliceType string) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
-	if result == "interface{}" {
+	if result == "interface{}" || strings.Contains(result, "map") {
 		return "array"
 	}
 
@@ -104,6 +119,9 @@ func TransformSliceTypeToPHP(rawSliceType string) string {
 
 func TransformSliceTypeToSwift(rawSliceType string) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
+	if strings.Contains(result, "map") {
+		return fmt.Sprintf("[%s]", GetRecordType(SwiftTranslationMode, result))
+	}
 	return fmt.Sprintf("[%s]", GetSwiftCompatibleType(result))
 }
 

@@ -29,6 +29,10 @@ func GetMapValueType(item ast.Expr) string {
 	switch value := item.(type) {
 	case *ast.Ident:
 		return value.Name
+	case *ast.MapType:
+		return fmt.Sprintf("map[%s]%s", GetMapValueType(value.Key), GetMapValueType(value.Value))
+	case *ast.ArrayType:
+		return GetSliceType(value)
 	default:
 		return "interface{}"
 	}

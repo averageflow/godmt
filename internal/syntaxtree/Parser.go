@@ -51,6 +51,10 @@ func parseStructField(item *ast.Field) *godmt.ScannedStructField {
 		return parseNestedStruct(item)
 	case *ast.SelectorExpr:
 		return godmt.ImportedStructFieldParser(item)
+	case *ast.MapType:
+		return godmt.SimpleStructFieldParser(item)
+	case *ast.ArrayType:
+		return parseComplexStructField(item.Names[0])
 	default:
 		return nil
 	}
@@ -83,6 +87,36 @@ func parseNestedStruct(field *ast.Field) *godmt.ScannedStructField {
 		ImportDetails: nil,
 		SubFields:     parsedNestedFields,
 	}
+}
+
+func parseComplexStructField(item *ast.Ident) *godmt.ScannedStructField {
+	decl := item.Obj.Decl
+	tag := reflect.ValueOf(decl).Elem().FieldByName("Tag").Interface().(*ast.BasicLit)
+	comments := reflect.ValueOf(decl).Elem().FieldByName("Doc").Interface().(*ast.CommentGroup)
+
+	objectType := reflect.ValueOf(decl).Elem().FieldByName("Type").Interface()
+
+	var kind string
+	var internalType int
+
+	switch objectTypeDetails := objectType.(type) {
+	case *ast.ArrayType:
+		internalType = godmt.SliceType
+		kind = godmt.GetSliceType(objectTypeDetails)
+	default:
+		return nil
+	}
+
+	return &godmt.ScannedStructField{
+		Name:          item.Name,
+		Kind:          kind,
+		Tag:           tag.Value,
+		Doc:           godmt.ExtractComments(comments),
+		ImportDetails: nil,
+		InternalType:  internalType,
+	}
+
+	return nil
 }
 
 func parseConstantsAndVariables(d *ast.Ident) []godmt.ScannedType {

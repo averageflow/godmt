@@ -106,9 +106,6 @@ func CompositeLiteralSliceParser(d *ast.Ident, sliceType string, item *ast.Compo
 // into a program readable ScannedStructField.
 func SimpleStructFieldParser(field *ast.Field) *ScannedStructField {
 	if field.Names != nil {
-		// Basic type of a field inside a struct
-		fieldType := reflect.ValueOf(field.Type).Elem().FieldByName("Name")
-
 		tag := field.Tag
 
 		var tagValue string
@@ -116,11 +113,26 @@ func SimpleStructFieldParser(field *ast.Field) *ScannedStructField {
 			tagValue = tag.Value
 		}
 
-		return &ScannedStructField{
-			Doc:  ExtractComments(field.Doc),
-			Name: field.Names[0].Name,
-			Kind: fieldType.Interface().(string),
-			Tag:  tagValue,
+		switch fieldType := field.Type.(type) {
+		case *ast.MapType:
+			key := GetMapValueType(fieldType.Key)
+			value := GetMapValueType(fieldType.Value)
+			kind := fmt.Sprintf("map[%s]%s", key, value)
+			return &ScannedStructField{
+				Doc:          ExtractComments(field.Doc),
+				Name:         field.Names[0].Name,
+				Kind:         kind,
+				Tag:          tagValue,
+				InternalType: MapType,
+			}
+		case *ast.Ident:
+			return &ScannedStructField{
+				Doc:          ExtractComments(field.Doc),
+				Name:         field.Names[0].Name,
+				Kind:         fieldType.Name,
+				Tag:          tagValue,
+				InternalType: ConstType,
+			}
 		}
 	}
 
@@ -170,5 +182,21 @@ func ImportedStructFieldParser(field *ast.Field) *ScannedStructField {
 			EntityName:  fieldType.Sel.Name,
 			PackageName: packageName,
 		},
+	}
+}
+
+func GetSliceType(objectTypeDetails *ast.ArrayType) string {
+	kind := "[]"
+	switch arrayElements := objectTypeDetails.Elt.(type) {
+	case *ast.MapType:
+		key := GetMapValueType(arrayElements.Key)
+		value := GetMapValueType(arrayElements.Value)
+		kind += fmt.Sprintf("map[%s]%s", key, value)
+		return kind
+	case *ast.Ident:
+		kind += arrayElements.Name
+		return kind
+	default:
+		return "interface{}"
 	}
 }

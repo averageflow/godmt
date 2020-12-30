@@ -36,6 +36,7 @@ type ScannedStructField struct {
 	Doc           []string               `json:"doc"`
 	ImportDetails *ImportedEntityDetails `json:"importedEntity"`
 	SubFields     []ScannedStructField   `json:"subFields"`
+	InternalType  int                    `json:"internalType"`
 }
 
 // ScannedStruct represents the details of a scanned struct.
