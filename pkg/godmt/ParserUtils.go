@@ -118,6 +118,7 @@ func SimpleStructFieldParser(field *ast.Field) *ScannedStructField {
 			key := GetMapValueType(fieldType.Key)
 			value := GetMapValueType(fieldType.Value)
 			kind := fmt.Sprintf("map[%s]%s", key, value)
+
 			return &ScannedStructField{
 				Doc:          ExtractComments(field.Doc),
 				Name:         field.Names[0].Name,
@@ -187,16 +188,18 @@ func ImportedStructFieldParser(field *ast.Field) *ScannedStructField {
 
 func GetSliceType(objectTypeDetails *ast.ArrayType) string {
 	kind := "[]"
+
 	switch arrayElements := objectTypeDetails.Elt.(type) {
 	case *ast.MapType:
 		key := GetMapValueType(arrayElements.Key)
 		value := GetMapValueType(arrayElements.Value)
 		kind += fmt.Sprintf("map[%s]%s", key, value)
+
 		return kind
 	case *ast.Ident:
 		kind += arrayElements.Name
 		return kind
 	default:
-		return "interface{}"
+		return "interface{}" //nolint:goconst
 	}
 }

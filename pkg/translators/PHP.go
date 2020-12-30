@@ -107,13 +107,17 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo,funlen
 		}
 
 		if entity.Doc != nil {
-			result += "\t/**\n"
+			result += "\t/**\n" //nolint:goconst
+
 			for k := range entity.Doc {
 				result += fmt.Sprintf("\t * %s\n", strings.ReplaceAll(entity.Doc[k], "// ", ""))
 			}
+
 			result += "\t*/\n"
 		}
+
 		result += fmt.Sprintf("\nclass %s", entity.Name)
+
 		if len(extendsClasses) > 0 {
 			result += fmt.Sprintf(" extends %s", strings.Join(extendsClasses, ", "))
 		}
@@ -136,32 +140,39 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo,funlen
 				switch entityField.InternalType {
 				case godmt.MapType:
 					result += "\t/**\n"
+
 					if entityField.Doc != nil {
 						for k := range entityField.Doc {
 							result += fmt.Sprintf("\t * %s\n", strings.ReplaceAll(entityField.Doc[k], "// ", ""))
 						}
 					}
+
 					result += fmt.Sprintf("\t * @var %s $%s\n", "array", tag)
-					result += "\t */\n"
+					result += "\t */\n" //nolint:goconst
 					result += fmt.Sprintf("\tpublic array $%s;\n\n", tag)
 				case godmt.SliceType:
 					result += "\t/**\n"
+
 					if entityField.Doc != nil {
 						for k := range entityField.Doc {
 							result += fmt.Sprintf("\t * %s\n", strings.ReplaceAll(entityField.Doc[k], "// ", ""))
 						}
 					}
+
 					result += fmt.Sprintf("\t * @var %s $%s\n", TransformSliceTypeToPHP(entityField.Kind), tag)
 					result += "\t */\n"
 					result += fmt.Sprintf("\tpublic array $%s;\n\n", tag)
 				default:
 					if entityField.Doc != nil {
 						result += "\t/**\n"
+
 						for k := range entityField.Doc {
 							result += fmt.Sprintf("\t * %s\n", strings.ReplaceAll(entityField.Doc[k], "// ", ""))
 						}
+
 						result += "\t */\n"
 					}
+
 					result += fmt.Sprintf("\tpublic %s $%s;\n\n", GetPHPCompatibleType(entityField.Kind), tag)
 				}
 			}

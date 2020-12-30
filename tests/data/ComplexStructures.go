@@ -1,6 +1,6 @@
 package data
 
-// ComplicatedMaps is a class that deserves a doc comment
+// ComplicatedMaps is a class that deserves a doc comment.
 type ComplicatedMaps struct {
 	// StrangeMapOne is a complicated type
 	StrangeMapOne map[string]map[string]int `json:"strangeMapOne"`

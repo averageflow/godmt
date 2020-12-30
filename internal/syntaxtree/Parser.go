@@ -97,6 +97,7 @@ func parseComplexStructField(item *ast.Ident) *godmt.ScannedStructField {
 	objectType := reflect.ValueOf(decl).Elem().FieldByName("Type").Interface()
 
 	var kind string
+
 	var internalType int
 
 	switch objectTypeDetails := objectType.(type) {
@@ -115,8 +116,6 @@ func parseComplexStructField(item *ast.Ident) *godmt.ScannedStructField {
 		ImportDetails: nil,
 		InternalType:  internalType,
 	}
-
-	return nil
 }
 
 func parseConstantsAndVariables(d *ast.Ident) []godmt.ScannedType {

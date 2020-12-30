@@ -50,6 +50,7 @@ func TransformTypeScriptRecord(goMapType string) string {
 	var re = regexp.MustCompile(`(?m)\[?]?map\[[^]^[]+]`)
 
 	var types []ScannedRecordItem
+
 	lastType := ScannedRecordItem{
 		Kind:       goMapType,
 		IsMapSlice: false,
@@ -60,11 +61,13 @@ func TransformTypeScriptRecord(goMapType string) string {
 			lastType.Kind = strings.ReplaceAll(lastType.Kind, match, "")
 			cleanMatch := strings.ReplaceAll(match, "[]map[", "")
 			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
+
 			types = append(types, ScannedRecordItem{Kind: GetTypescriptCompatibleType(cleanMatch), IsMapSlice: true})
 		} else {
 			lastType.Kind = strings.ReplaceAll(lastType.Kind, match, "")
 			cleanMatch := strings.ReplaceAll(match, "map[", "")
 			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
+
 			types = append(types, ScannedRecordItem{Kind: GetTypescriptCompatibleType(cleanMatch)})
 		}
 	}
@@ -72,7 +75,6 @@ func TransformTypeScriptRecord(goMapType string) string {
 	if strings.HasPrefix(lastType.Kind, "[]") {
 		lastType.Kind = TransformSliceTypeToTypeScript(lastType.Kind)
 	} else {
-
 		lastType.Kind = GetTypescriptCompatibleType(lastType.Kind)
 	}
 
@@ -80,7 +82,7 @@ func TransformTypeScriptRecord(goMapType string) string {
 
 	for i := range types {
 		if i != 0 && i <= len(types)-1 {
-			result += ", "
+			result += ", " //nolint:goconst
 		}
 
 		result += "Record<"
@@ -88,6 +90,7 @@ func TransformTypeScriptRecord(goMapType string) string {
 	}
 
 	result += ", " + lastType.Kind
+
 	for i := range types {
 		if types[i].IsMapSlice {
 			result += "[]>"
@@ -103,6 +106,7 @@ func TransformSwiftRecord(goMapType string) string {
 	var re = regexp.MustCompile(`(?m)\[?]?map\[[^]^[]+]`)
 
 	var types []ScannedRecordItem
+
 	lastType := ScannedRecordItem{
 		Kind:       goMapType,
 		IsMapSlice: false,
@@ -113,6 +117,7 @@ func TransformSwiftRecord(goMapType string) string {
 			lastType.Kind = strings.ReplaceAll(lastType.Kind, match, "")
 			cleanMatch := strings.ReplaceAll(match, "[]map[", "")
 			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
+
 			types = append(types, ScannedRecordItem{Kind: GetSwiftCompatibleType(cleanMatch), IsMapSlice: true})
 		} else {
 			lastType.Kind = strings.ReplaceAll(lastType.Kind, match, "")
@@ -138,12 +143,13 @@ func TransformSwiftRecord(goMapType string) string {
 		if types[i].IsMapSlice {
 			result += "["
 		}
+
 		result += "Dictionary<"
 		result += types[i].Kind
-
 	}
 
 	result += ", " + lastType.Kind
+
 	for i := range types {
 		if types[i].IsMapSlice {
 			result += "]>"
@@ -178,6 +184,7 @@ func TransformSliceTypeToTypeScript(rawSliceType string) string {
 	if strings.Contains(result, "map") {
 		return fmt.Sprintf("%s[]", TransformTypeScriptRecord(result))
 	}
+
 	return fmt.Sprintf("%s[]", GetTypescriptCompatibleType(result))
 }
 
@@ -195,6 +202,7 @@ func TransformSliceTypeToSwift(rawSliceType string) string {
 	if strings.Contains(result, "map") {
 		return fmt.Sprintf("[%s]", TransformSwiftRecord(result))
 	}
+
 	return fmt.Sprintf("[%s]", GetSwiftCompatibleType(result))
 }
 
