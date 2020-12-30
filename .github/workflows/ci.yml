@@ -20,3 +20,5 @@ jobs:
         run: |
           go test -v -coverprofile=coverage.out ./...
           curl -s https://codecov.io/bash | bash
+          cd cmd/godmt
+          go build
