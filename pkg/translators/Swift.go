@@ -50,7 +50,7 @@ func (t *SwiftTranslator) Translate() string { //nolint:gocognit,gocyclo
 			result += fmt.Sprintf(
 				"let %s: %s = [\n",
 				entity.Name,
-				GetDictionaryType(entity.Kind),
+				TransformSwiftRecord(entity.Kind),
 			)
 			result += fmt.Sprintf("%s\n", MapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
 			result += "]\n\n" //nolint:goconst
@@ -116,7 +116,14 @@ func (t *SwiftTranslator) Translate() string { //nolint:gocognit,gocyclo
 
 				result += "\t}\n" //nolint:goconst
 			} else {
-				result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), GetSwiftCompatibleType(entityField.Kind))
+				switch entityField.InternalType {
+				case godmt.MapType:
+					result += fmt.Sprintf("\tvar %s: %s\n", tag, TransformSwiftRecord(entityField.Kind))
+				case godmt.SliceType:
+					result += fmt.Sprintf("\tvar %s: %s\n", tag, TransformSliceTypeToSwift(entityField.Kind))
+				default:
+					result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), GetSwiftCompatibleType(entityField.Kind))
+				}
 			}
 
 			structExtension += fmt.Sprintf("\t\tcase %s = \"%s\"\n", toCamelCase(tag), tag)

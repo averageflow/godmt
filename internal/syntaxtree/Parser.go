@@ -44,13 +44,34 @@ func parseStruct(d *ast.Ident) []godmt.ScannedStruct {
 }
 
 func parseStructField(item *ast.Field) *godmt.ScannedStructField {
-	switch item.Type.(type) {
+	switch item.Type.(type) { //nolint:gocritic
 	case *ast.Ident:
 		return godmt.SimpleStructFieldParser(item)
 	case *ast.StructType:
 		return parseNestedStruct(item)
 	case *ast.SelectorExpr:
 		return godmt.ImportedStructFieldParser(item)
+	case *ast.MapType:
+		return godmt.SimpleStructFieldParser(item)
+	case *ast.ArrayType:
+		return parseComplexStructField(item.Names[0])
+	case *ast.StarExpr:
+		pointer := item.Type.(*ast.StarExpr).X
+		switch value := pointer.(type) {
+		// case *ast.ArrayType: // FUTURE: do array and map pointers
+		case *ast.Ident:
+			return &godmt.ScannedStructField{
+				Doc:          godmt.ExtractComments(item.Doc),
+				Name:         item.Names[0].Name,
+				Kind:         value.Name,
+				Tag:          item.Tag.Value,
+				InternalType: godmt.VarType,
+				IsPointer:    true,
+			}
+
+		default:
+			return nil
+		}
 	default:
 		return nil
 	}
@@ -82,6 +103,35 @@ func parseNestedStruct(field *ast.Field) *godmt.ScannedStructField {
 		Doc:           godmt.ExtractComments(field.Doc),
 		ImportDetails: nil,
 		SubFields:     parsedNestedFields,
+	}
+}
+
+func parseComplexStructField(item *ast.Ident) *godmt.ScannedStructField {
+	decl := item.Obj.Decl
+	tag := reflect.ValueOf(decl).Elem().FieldByName("Tag").Interface().(*ast.BasicLit)
+	comments := reflect.ValueOf(decl).Elem().FieldByName("Doc").Interface().(*ast.CommentGroup)
+
+	objectType := reflect.ValueOf(decl).Elem().FieldByName("Type").Interface()
+
+	var kind string
+
+	var internalType int
+
+	switch objectTypeDetails := objectType.(type) {
+	case *ast.ArrayType:
+		internalType = godmt.SliceType
+		kind = godmt.GetSliceType(objectTypeDetails)
+	default:
+		return nil
+	}
+
+	return &godmt.ScannedStructField{
+		Name:          item.Name,
+		Kind:          kind,
+		Tag:           tag.Value,
+		Doc:           godmt.ExtractComments(comments),
+		ImportDetails: nil,
+		InternalType:  internalType,
 	}
 }
 

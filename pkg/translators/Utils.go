@@ -2,6 +2,7 @@ package translators
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/averageflow/godmt/pkg/godmt"
@@ -13,10 +14,14 @@ func IsEmbeddedStructForInheritance(field *godmt.ScannedStructField) bool {
 	return field.Kind == "struct" && field.Tag == ""
 }
 
-func GetTypescriptCompatibleType(goType string) string {
+func GetTypescriptCompatibleType(goType string, isPointer bool) string {
 	result, ok := goTypeScriptTypeMappings[goType]
 	if !ok {
-		return goType
+		return fmt.Sprintf("%s | null", goType)
+	}
+
+	if isPointer {
+		return fmt.Sprintf("%s | null", result)
 	}
 
 	return result
@@ -40,34 +45,124 @@ func GetSwiftCompatibleType(goType string) string {
 	return result
 }
 
-func GetRecordType(goMapType string) string {
-	var result string
-
-	result = strings.ReplaceAll(goMapType, "map[", "")
-	recordTypes := strings.Split(result, "]")
-
-	for i := range recordTypes {
-		recordTypes[i] = GetTypescriptCompatibleType(recordTypes[i])
-	}
-
-	result = strings.Join(recordTypes, ", ")
-
-	return fmt.Sprintf("Record<%s>", result)
+type ScannedRecordItem struct {
+	Kind       string
+	IsMapSlice bool
 }
 
-func GetDictionaryType(goMapType string) string {
-	var result string
+func TransformTypeScriptRecord(goMapType string) string {
+	var re = regexp.MustCompile(`(?m)\[?]?map\[[^]^[]+]`)
 
-	result = strings.ReplaceAll(goMapType, "map[", "")
-	recordTypes := strings.Split(result, "]")
+	var types []ScannedRecordItem
 
-	for i := range recordTypes {
-		recordTypes[i] = GetSwiftCompatibleType(recordTypes[i])
+	lastType := ScannedRecordItem{
+		Kind:       goMapType,
+		IsMapSlice: false,
 	}
 
-	result = strings.Join(recordTypes, ", ")
+	for _, match := range re.FindAllString(goMapType, -1) {
+		if strings.HasPrefix(match, "[]map") {
+			lastType.Kind = strings.ReplaceAll(lastType.Kind, match, "")
+			cleanMatch := strings.ReplaceAll(match, "[]map[", "")
+			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
 
-	return fmt.Sprintf("Dictionary<%s>", result)
+			types = append(types, ScannedRecordItem{Kind: GetTypescriptCompatibleType(cleanMatch, false), IsMapSlice: true})
+		} else {
+			lastType.Kind = strings.ReplaceAll(lastType.Kind, match, "")
+			cleanMatch := strings.ReplaceAll(match, "map[", "")
+			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
+
+			types = append(types, ScannedRecordItem{Kind: GetTypescriptCompatibleType(cleanMatch, false)})
+		}
+	}
+
+	if strings.HasPrefix(lastType.Kind, "[]") {
+		lastType.Kind = TransformSliceTypeToTypeScript(lastType.Kind)
+	} else {
+		lastType.Kind = GetTypescriptCompatibleType(lastType.Kind, false)
+	}
+
+	var result string
+
+	for i := range types {
+		if i != 0 && i <= len(types)-1 {
+			result += ", " //nolint:goconst
+		}
+
+		result += "Record<"
+		result += types[i].Kind
+	}
+
+	result += ", " + lastType.Kind
+
+	for i := range types {
+		if types[i].IsMapSlice {
+			result += "[]>"
+		} else {
+			result += ">"
+		}
+	}
+
+	return result
+}
+
+func TransformSwiftRecord(goMapType string) string {
+	var re = regexp.MustCompile(`(?m)\[?]?map\[[^]^[]+]`)
+
+	var types []ScannedRecordItem
+
+	lastType := ScannedRecordItem{
+		Kind:       goMapType,
+		IsMapSlice: false,
+	}
+
+	for _, match := range re.FindAllString(goMapType, -1) {
+		if strings.HasPrefix(match, "[]map") {
+			lastType.Kind = strings.ReplaceAll(lastType.Kind, match, "")
+			cleanMatch := strings.ReplaceAll(match, "[]map[", "")
+			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
+
+			types = append(types, ScannedRecordItem{Kind: GetSwiftCompatibleType(cleanMatch), IsMapSlice: true})
+		} else {
+			lastType.Kind = strings.ReplaceAll(lastType.Kind, match, "")
+			cleanMatch := strings.ReplaceAll(match, "map[", "")
+			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
+			types = append(types, ScannedRecordItem{Kind: GetSwiftCompatibleType(cleanMatch)})
+		}
+	}
+
+	if strings.HasPrefix(lastType.Kind, "[]") {
+		lastType.Kind = TransformSliceTypeToSwift(lastType.Kind)
+	} else {
+		lastType.Kind = GetSwiftCompatibleType(lastType.Kind)
+	}
+
+	var result string
+
+	for i := range types {
+		if i != 0 && i <= len(types)-1 {
+			result += ", "
+		}
+
+		if types[i].IsMapSlice {
+			result += "["
+		}
+
+		result += "Dictionary<"
+		result += types[i].Kind
+	}
+
+	result += ", " + lastType.Kind
+
+	for i := range types {
+		if types[i].IsMapSlice {
+			result += "]>"
+		} else {
+			result += ">"
+		}
+	}
+
+	return result
 }
 
 func MapValuesToTypeScriptRecord(rawMap map[string]string) string {
@@ -90,12 +185,16 @@ func MapValuesToPHPArray(rawMap map[string]string) string {
 
 func TransformSliceTypeToTypeScript(rawSliceType string) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
-	return fmt.Sprintf("%s[]", GetTypescriptCompatibleType(result))
+	if strings.Contains(result, "map") {
+		return fmt.Sprintf("%s[]", TransformTypeScriptRecord(result))
+	}
+
+	return fmt.Sprintf("%s[]", GetTypescriptCompatibleType(result, false))
 }
 
 func TransformSliceTypeToPHP(rawSliceType string) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
-	if result == "interface{}" {
+	if result == "interface{}" || strings.Contains(result, "map") {
 		return "array"
 	}
 
@@ -104,6 +203,10 @@ func TransformSliceTypeToPHP(rawSliceType string) string {
 
 func TransformSliceTypeToSwift(rawSliceType string) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
+	if strings.Contains(result, "map") {
+		return fmt.Sprintf("[%s]", TransformSwiftRecord(result))
+	}
+
 	return fmt.Sprintf("[%s]", GetSwiftCompatibleType(result))
 }
 

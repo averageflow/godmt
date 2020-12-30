@@ -57,13 +57,16 @@ export interface ExtendedScannedType extends ScannedType {
 }
 
 export interface ScannedStruct {
+    doc: string[];
     name: string;
+    fields: boolean[];
     internalType: number;
 }
 
 export interface ScannedType {
     name: string;
     kind: string;
+    doc: string[];
     internalType: number;
 }
 ```
@@ -87,22 +90,28 @@ struct ExtendedScannedType: Decodable {
 	var anExtraField: Bool
 	var name: String
 	var kind: String
+	var doc: [String]
 	var internalType: Int
 
 	enum CodingKeys: String, CodingKey {
 		case anExtraField = "anExtraField"
 		case name = "name"
 		case kind = "kind"
+		case doc = "doc"
 		case internalType = "internalType"
 	}
 }
 
 struct ScannedStruct: Decodable {
+	var doc: [String]
 	var name: String
+	var fields: [Bool]
 	var internalType: Int
 
 	enum CodingKeys: String, CodingKey {
+		case doc = "doc"
 		case name = "name"
+		case fields = "fields"
 		case internalType = "internalType"
 	}
 }
@@ -110,11 +119,13 @@ struct ScannedStruct: Decodable {
 struct ScannedType: Decodable {
 	var name: String
 	var kind: String
+	var doc: [String]
 	var internalType: Int
 
 	enum CodingKeys: String, CodingKey {
 		case name = "name"
 		case kind = "kind"
+		case doc = "doc"
 		case internalType = "internalType"
 	}
 }
@@ -129,6 +140,7 @@ PHP: <a name="php"></a>
 class EmbeddedType {
 	public string $id;
 
+
 	public function __construct(array $data) {
 		$this->id = $data['id'];
 		$this->data = $data['data'];
@@ -138,29 +150,53 @@ class EmbeddedType {
 class ExtendedScannedType extends ScannedType {
 	public bool $anExtraField;
 
+
 	public function __construct(array $data) {
 		$this->anExtraField = $data['anExtraField'];
 	}
 }
 
 class ScannedStruct {
+	/**
+	 * @var string[] $doc
+	 */
+	public array $doc;
+
 	public string $name;
+
+	/**
+	 * @var bool[] $fields
+	 */
+	public array $fields;
+
 	public int $internalType;
 
+
 	public function __construct(array $data) {
+		$this->doc = $data['doc'];
 		$this->name = $data['name'];
+		$this->fields = $data['fields'];
 		$this->internalType = $data['internalType'];
 	}
 }
 
 class ScannedType {
 	public string $name;
+
 	public string $kind;
+
+	/**
+	 * @var string[] $doc
+	 */
+	public array $doc;
+
 	public int $internalType;
+
 
 	public function __construct(array $data) {
 		$this->name = $data['name'];
 		$this->kind = $data['kind'];
+		$this->doc = $data['doc'];
 		$this->internalType = $data['internalType'];
 	}
 }
@@ -182,7 +218,8 @@ JSON: <a name="json"></a>
           "tag": "`json:\"id\"`",
           "doc": null,
           "importedEntity": null,
-          "subFields": null
+          "subFields": null,
+          "internalType": 3
         },
         {
           "name": "Data",
@@ -197,9 +234,11 @@ JSON: <a name="json"></a>
               "tag": "`json:\"test\"`",
               "doc": null,
               "importedEntity": null,
-              "subFields": null
+              "subFields": null,
+              "internalType": 3
             }
-          ]
+          ],
+          "internalType": 0
         }
       ],
       "internalType": 4
@@ -214,7 +253,8 @@ JSON: <a name="json"></a>
           "tag": "",
           "doc": null,
           "importedEntity": null,
-          "subFields": null
+          "subFields": null,
+          "internalType": 0
         },
         {
           "name": "AnExtraField",
@@ -222,7 +262,8 @@ JSON: <a name="json"></a>
           "tag": "`json:\"anExtraField\"`",
           "doc": null,
           "importedEntity": null,
-          "subFields": null
+          "subFields": null,
+          "internalType": 3
         }
       ],
       "internalType": 4
@@ -232,12 +273,31 @@ JSON: <a name="json"></a>
       "name": "ScannedStruct",
       "fields": [
         {
+          "name": "Doc",
+          "kind": "[]string",
+          "tag": "`json:\"doc\" binding:\"required\" validation:\"required\"`",
+          "doc": null,
+          "importedEntity": null,
+          "subFields": null,
+          "internalType": 5
+        },
+        {
           "name": "Name",
           "kind": "string",
           "tag": "`json:\"name\" binding:\"required\" validation:\"required\"`",
           "doc": null,
           "importedEntity": null,
-          "subFields": null
+          "subFields": null,
+          "internalType": 3
+        },
+        {
+          "name": "Fields",
+          "kind": "[]bool",
+          "tag": "`json:\"fields\" binding:\"required\" validation:\"required\"`",
+          "doc": null,
+          "importedEntity": null,
+          "subFields": null,
+          "internalType": 5
         },
         {
           "name": "InternalType",
@@ -245,7 +305,8 @@ JSON: <a name="json"></a>
           "tag": "`xml:\"internalType\" binding:\"required\" validation:\"required\"`",
           "doc": null,
           "importedEntity": null,
-          "subFields": null
+          "subFields": null,
+          "internalType": 3
         }
       ],
       "internalType": 4
@@ -260,7 +321,8 @@ JSON: <a name="json"></a>
           "tag": "`json:\"name\"`",
           "doc": null,
           "importedEntity": null,
-          "subFields": null
+          "subFields": null,
+          "internalType": 3
         },
         {
           "name": "Kind",
@@ -268,7 +330,17 @@ JSON: <a name="json"></a>
           "tag": "`json:\"kind\"`",
           "doc": null,
           "importedEntity": null,
-          "subFields": null
+          "subFields": null,
+          "internalType": 3
+        },
+        {
+          "name": "Doc",
+          "kind": "[]string",
+          "tag": "`json:\"doc\"`",
+          "doc": null,
+          "importedEntity": null,
+          "subFields": null,
+          "internalType": 5
         },
         {
           "name": "InternalType",
@@ -276,7 +348,8 @@ JSON: <a name="json"></a>
           "tag": "`json:\"internalType\"`",
           "doc": null,
           "importedEntity": null,
-          "subFields": null
+          "subFields": null,
+          "internalType": 3
         }
       ],
       "internalType": 4
