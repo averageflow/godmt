@@ -58,13 +58,17 @@ func main() {
 
 		switch config.TranslateMode {
 		case translators.TypeScriptTranslationMode:
+			filename = strings.ReplaceAll(filename, ".go", ".ts")
+			ts := translators.TypeScriptTranslator{
+				Translator: baseTranslator,
+			}
+			resultingOutput = ts.Translate()
 		case translators.TSTranslationMode:
 			filename = strings.ReplaceAll(filename, ".go", ".ts")
 			ts := translators.TypeScriptTranslator{
 				Translator: baseTranslator,
 			}
 			resultingOutput = ts.Translate()
-
 		case translators.SwiftTranslationMode:
 			filename = strings.ReplaceAll(filename, ".go", ".swift")
 			s := translators.SwiftTranslator{

@@ -32,6 +32,7 @@ Feel free to browse some examples that I am happy to provide here:
 - [Complex Structures](examples/ComplexStructures.md)
 - [Constants](examples/Constants.md)
 - [Maps](examples/Maps.md)
+- [Pointers](examples/Pointers.md)
 - [Slices](examples/Slices.md)
 - [Structs](examples/Structs.md)
 
