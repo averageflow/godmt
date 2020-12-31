@@ -15,7 +15,12 @@ that include `var`, `const`, `map`, `struct` and `type` into an abstract syntax 
   <img width="250" height="150" src="web/DMT.png">
 </p>
 
-That AST will then be transformed into data models for several programming languages.
+That AST will then be transformed into data models for several programming languages. Currently GoDMT can perform translations to:
+
+- TypeScript
+- Swift (using Decodable structs)
+- JSON
+- PHP
 
 Some small adjustments may need to be made to integrate the output into a project, but this should already save you a
 lot of time and hassle, and will help you stay in sync with the Go version of your data models, in other languages. Comments will be carried over 😉.
@@ -29,6 +34,7 @@ Currently, the supported operating systems are all of UNIX family:
 ## Talk is cheap, show code
 
 Feel free to browse some examples that I am happy to provide here:
+
 - [Complex Structures](examples/ComplexStructures.md)
 - [Constants](examples/Constants.md)
 - [Maps](examples/Maps.md)
