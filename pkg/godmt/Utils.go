@@ -71,10 +71,25 @@ func SliceValuesToPrettyList(raw []string) string {
 func CleanTagName(rawTagName string) string {
 	jsonRegex := regexp.MustCompile(`(?m)json:"[^"]+"`)
 	xmlRegex := regexp.MustCompile(`(?m)xml:"[^"]+"`)
+	dbRegex := regexp.MustCompile(`(?m)db:"[^"]+"`)
+	uriRegex := regexp.MustCompile(`(?m)uri:"[^"]+"`)
+	formRegex := regexp.MustCompile(`(?m)form:"[^"]+"`)
+	mapStructureRegex := regexp.MustCompile(`(?m)mapstructure:"[^"]+"`)
+	headerRegex := regexp.MustCompile(`(?m)header:"[^"]+"`)
 
 	var jsonTagName []string //nolint:prealloc
 
 	var xmlTagName []string //nolint:prealloc
+
+	var dbTagName []string //nolint:prealloc
+
+	var uriTagName []string //nolint:prealloc
+
+	var formTagName []string //nolint:prealloc
+
+	var mapStructureTagName []string //nolint:prealloc
+
+	var headerTagName []string //nolint:prealloc
 
 	// By default use JSON tag name
 	for _, match := range jsonRegex.FindAllString(rawTagName, -1) {
@@ -100,6 +115,6 @@ func CleanTagName(rawTagName string) string {
 		return strings.Join(xmlTagName, "")
 	}
 
-	// Fallback to the raw tag
-	return rawTagName
+	// Fallback to return an empty string
+	return ""
 }
