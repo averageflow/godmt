@@ -27,19 +27,27 @@ func GetTypescriptCompatibleType(goType string, isPointer bool) string {
 	return result
 }
 
-func GetPHPCompatibleType(goType string) string {
+func GetPHPCompatibleType(goType string, isPointer bool) string {
 	result, ok := goPHPTypeMappings[goType]
 	if !ok {
-		return goType
+		return fmt.Sprintf("?%s", goType)
+	}
+
+	if isPointer {
+		return fmt.Sprintf("?%s", result)
 	}
 
 	return result
 }
 
-func GetSwiftCompatibleType(goType string) string {
+func GetSwiftCompatibleType(goType string, isPointer bool) string {
 	result, ok := goSwiftTypeMappings[goType]
 	if !ok {
-		return goType
+		return fmt.Sprintf("%s?", goType)
+	}
+
+	if isPointer {
+		return fmt.Sprintf("%s?", result)
 	}
 
 	return result
@@ -50,7 +58,7 @@ type ScannedRecordItem struct {
 	IsMapSlice bool
 }
 
-func TransformTypeScriptRecord(goMapType string) string {
+func TransformTypeScriptRecord(goMapType string, isPointer bool) string {
 	var re = regexp.MustCompile(`(?m)\[?]?map\[[^]^[]+]`)
 
 	var types []ScannedRecordItem
@@ -77,7 +85,7 @@ func TransformTypeScriptRecord(goMapType string) string {
 	}
 
 	if strings.HasPrefix(lastType.Kind, "[]") {
-		lastType.Kind = TransformSliceTypeToTypeScript(lastType.Kind)
+		lastType.Kind = TransformSliceTypeToTypeScript(lastType.Kind, false)
 	} else {
 		lastType.Kind = GetTypescriptCompatibleType(lastType.Kind, false)
 	}
@@ -103,10 +111,14 @@ func TransformTypeScriptRecord(goMapType string) string {
 		}
 	}
 
+	if isPointer {
+		return fmt.Sprintf("%s | null", result)
+	}
+
 	return result
 }
 
-func TransformSwiftRecord(goMapType string) string {
+func TransformSwiftRecord(goMapType string, isPointer bool) string {
 	var re = regexp.MustCompile(`(?m)\[?]?map\[[^]^[]+]`)
 
 	var types []ScannedRecordItem
@@ -122,19 +134,19 @@ func TransformSwiftRecord(goMapType string) string {
 			cleanMatch := strings.ReplaceAll(match, "[]map[", "")
 			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
 
-			types = append(types, ScannedRecordItem{Kind: GetSwiftCompatibleType(cleanMatch), IsMapSlice: true})
+			types = append(types, ScannedRecordItem{Kind: GetSwiftCompatibleType(cleanMatch, false), IsMapSlice: true})
 		} else {
 			lastType.Kind = strings.ReplaceAll(lastType.Kind, match, "")
 			cleanMatch := strings.ReplaceAll(match, "map[", "")
 			cleanMatch = strings.ReplaceAll(cleanMatch, "]", "")
-			types = append(types, ScannedRecordItem{Kind: GetSwiftCompatibleType(cleanMatch)})
+			types = append(types, ScannedRecordItem{Kind: GetSwiftCompatibleType(cleanMatch, false)})
 		}
 	}
 
 	if strings.HasPrefix(lastType.Kind, "[]") {
-		lastType.Kind = TransformSliceTypeToSwift(lastType.Kind)
+		lastType.Kind = TransformSliceTypeToSwift(lastType.Kind, false)
 	} else {
-		lastType.Kind = GetSwiftCompatibleType(lastType.Kind)
+		lastType.Kind = GetSwiftCompatibleType(lastType.Kind, false)
 	}
 
 	var result string
@@ -162,6 +174,10 @@ func TransformSwiftRecord(goMapType string) string {
 		}
 	}
 
+	if isPointer {
+		return fmt.Sprintf("%s?", result)
+	}
+
 	return result
 }
 
@@ -183,31 +199,49 @@ func MapValuesToPHPArray(rawMap map[string]string) string {
 	return strings.Join(entries, ",\n")
 }
 
-func TransformSliceTypeToTypeScript(rawSliceType string) string {
+func TransformSliceTypeToTypeScript(rawSliceType string, isPointer bool) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
 	if strings.Contains(result, "map") {
-		return fmt.Sprintf("%s[]", TransformTypeScriptRecord(result))
+		result = fmt.Sprintf("%s[]", TransformTypeScriptRecord(result, false))
+	} else {
+		result = fmt.Sprintf("%s[]", GetTypescriptCompatibleType(result, false))
 	}
 
-	return fmt.Sprintf("%s[]", GetTypescriptCompatibleType(result, false))
+	if isPointer {
+		return fmt.Sprintf("%s | null", result)
+	}
+
+	return result
 }
 
-func TransformSliceTypeToPHP(rawSliceType string) string {
+func TransformSliceTypeToPHP(rawSliceType string, isPointer bool) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
 	if result == "interface{}" || strings.Contains(result, "map") {
-		return "array"
+		result = "array"
+	} else {
+		result = fmt.Sprintf("%s[]", GetPHPCompatibleType(result, isPointer))
 	}
 
-	return fmt.Sprintf("%s[]", GetPHPCompatibleType(result))
+	if isPointer {
+		return fmt.Sprintf("?%s", result)
+	}
+
+	return result
 }
 
-func TransformSliceTypeToSwift(rawSliceType string) string {
+func TransformSliceTypeToSwift(rawSliceType string, isPointer bool) string {
 	result := strings.ReplaceAll(rawSliceType, "[]", "")
 	if strings.Contains(result, "map") {
-		return fmt.Sprintf("[%s]", TransformSwiftRecord(result))
+		result = fmt.Sprintf("[%s]", TransformSwiftRecord(result, false))
+	} else {
+		result = fmt.Sprintf("[%s]", GetSwiftCompatibleType(result, isPointer))
 	}
 
-	return fmt.Sprintf("[%s]", GetSwiftCompatibleType(result))
+	if isPointer {
+		return fmt.Sprintf("%s?", result)
+	}
+
+	return result
 }
 
 func toCamelCase(raw string) string {

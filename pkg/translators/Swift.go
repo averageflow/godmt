@@ -43,14 +43,14 @@ func (t *SwiftTranslator) Translate() string { //nolint:gocognit,gocyclo
 			result += fmt.Sprintf(
 				"let %s: %s = %s\n\n",
 				entity.Name,
-				GetSwiftCompatibleType(entity.Kind),
+				GetSwiftCompatibleType(entity.Kind, false),
 				entity.Value,
 			)
 		case godmt.MapType:
 			result += fmt.Sprintf(
 				"let %s: %s = [\n",
 				entity.Name,
-				TransformSwiftRecord(entity.Kind),
+				TransformSwiftRecord(entity.Kind, false),
 			)
 			result += fmt.Sprintf("%s\n", MapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
 			result += "]\n\n" //nolint:goconst
@@ -58,7 +58,7 @@ func (t *SwiftTranslator) Translate() string { //nolint:gocognit,gocyclo
 			result += fmt.Sprintf(
 				"var %s: %s = [\n",
 				entity.Name,
-				TransformSliceTypeToSwift(entity.Kind),
+				TransformSliceTypeToSwift(entity.Kind, false),
 			)
 			result += fmt.Sprintf("%s\n", godmt.SliceValuesToPrettyList(entity.Value.([]string)))
 			result += "];\n\n" //nolint:goconst
@@ -111,18 +111,22 @@ func (t *SwiftTranslator) Translate() string { //nolint:gocognit,gocyclo
 						subtag = entityField.SubFields[k].Name
 					}
 
-					result += fmt.Sprintf("\t\tvar %s: %s;\n", quoteWhenNeeded(subtag), GetSwiftCompatibleType(entityField.SubFields[k].Kind))
+					result += fmt.Sprintf(
+						"\t\tvar %s: %s;\n",
+						quoteWhenNeeded(subtag),
+						GetSwiftCompatibleType(entityField.SubFields[k].Kind, entityField.SubFields[k].IsPointer),
+					)
 				}
 
 				result += "\t}\n" //nolint:goconst
 			} else {
 				switch entityField.InternalType {
 				case godmt.MapType:
-					result += fmt.Sprintf("\tvar %s: %s\n", tag, TransformSwiftRecord(entityField.Kind))
+					result += fmt.Sprintf("\tvar %s: %s\n", tag, TransformSwiftRecord(entityField.Kind, entityField.IsPointer))
 				case godmt.SliceType:
-					result += fmt.Sprintf("\tvar %s: %s\n", tag, TransformSliceTypeToSwift(entityField.Kind))
+					result += fmt.Sprintf("\tvar %s: %s\n", tag, TransformSliceTypeToSwift(entityField.Kind, entityField.IsPointer))
 				default:
-					result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), GetSwiftCompatibleType(entityField.Kind))
+					result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), GetSwiftCompatibleType(entityField.Kind, entityField.IsPointer))
 				}
 			}
 

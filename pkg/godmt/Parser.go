@@ -1,6 +1,7 @@
 package godmt
 
 import (
+	"fmt"
 	"go/ast"
 	"reflect"
 )
@@ -56,7 +57,15 @@ func ParseStructField(item *ast.Field) *ScannedStructField {
 	case *ast.StarExpr:
 		pointer := item.Type.(*ast.StarExpr).X
 		switch value := pointer.(type) {
-		// case *ast.ArrayType: // FUTURE: do array and map pointers
+		case *ast.ArrayType:
+			return &ScannedStructField{
+				Doc:          ExtractComments(item.Doc),
+				Name:         item.Names[0].Name,
+				Kind:         GetSliceType(value),
+				Tag:          item.Tag.Value,
+				InternalType: SliceType,
+				IsPointer:    true,
+			}
 		case *ast.Ident:
 			return &ScannedStructField{
 				Doc:          ExtractComments(item.Doc),
@@ -66,7 +75,19 @@ func ParseStructField(item *ast.Field) *ScannedStructField {
 				InternalType: VarType,
 				IsPointer:    true,
 			}
+		case *ast.MapType:
+			key := GetMapValueType(value.Key)
+			keyvalue := GetMapValueType(value.Value)
+			kind := fmt.Sprintf("map[%s]%s", key, keyvalue)
 
+			return &ScannedStructField{
+				Doc:          ExtractComments(item.Doc),
+				Name:         item.Names[0].Name,
+				Kind:         kind,
+				Tag:          item.Tag.Value,
+				InternalType: MapType,
+				IsPointer:    true,
+			}
 		default:
 			return nil
 		}
