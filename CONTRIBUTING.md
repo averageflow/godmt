@@ -24,10 +24,8 @@
 
 * Email me personally at jjbigorra@gmail.com
 
-#### **Do you want to contribute to the Rails documentation?**
+#### **Do you want to contribute to the GoDMT documentation?**
 
-GoDMT is a volunteer effort. We encourage you to pitch in and join the team!
+GoDMT is a volunteer effort. We encourage you to pitch in and join the team and improve the wiki too!
 
 Thanks! :heart: :heart: :heart:
-
-Rails Team
