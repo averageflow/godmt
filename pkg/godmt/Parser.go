@@ -21,7 +21,7 @@ func ParseStruct(d *ast.Ident) []ScannedStruct {
 		var rawScannedFields []ScannedStructField
 
 		for i := range fieldList {
-			parsed := parseStructField(fieldList[i])
+			parsed := ParseStructField(fieldList[i])
 			if parsed != nil {
 				rawScannedFields = append(rawScannedFields, *parsed)
 			}
@@ -41,18 +41,18 @@ func ParseStruct(d *ast.Ident) []ScannedStruct {
 	return result
 }
 
-func parseStructField(item *ast.Field) *ScannedStructField {
+func ParseStructField(item *ast.Field) *ScannedStructField {
 	switch item.Type.(type) { //nolint:gocritic
 	case *ast.Ident:
 		return SimpleStructFieldParser(item)
 	case *ast.StructType:
-		return parseNestedStruct(item)
+		return ParseNestedStruct(item)
 	case *ast.SelectorExpr:
 		return ImportedStructFieldParser(item)
 	case *ast.MapType:
 		return SimpleStructFieldParser(item)
 	case *ast.ArrayType:
-		return parseComplexStructField(item.Names[0])
+		return ParseComplexStructField(item.Names[0])
 	case *ast.StarExpr:
 		pointer := item.Type.(*ast.StarExpr).X
 		switch value := pointer.(type) {
@@ -75,13 +75,13 @@ func parseStructField(item *ast.Field) *ScannedStructField {
 	}
 }
 
-func parseNestedStruct(field *ast.Field) *ScannedStructField {
+func ParseNestedStruct(field *ast.Field) *ScannedStructField {
 	nestedFields := reflect.ValueOf(field.Type).Elem().FieldByName("Fields").Interface().(*ast.FieldList)
 
 	var parsedNestedFields []ScannedStructField
 
 	for i := range nestedFields.List {
-		parsedField := parseStructField(nestedFields.List[i])
+		parsedField := ParseStructField(nestedFields.List[i])
 		if parsedField != nil {
 			parsedNestedFields = append(parsedNestedFields, *parsedField)
 		}
@@ -104,7 +104,7 @@ func parseNestedStruct(field *ast.Field) *ScannedStructField {
 	}
 }
 
-func parseComplexStructField(item *ast.Ident) *ScannedStructField {
+func ParseComplexStructField(item *ast.Ident) *ScannedStructField {
 	decl := item.Obj.Decl
 	tag := reflect.ValueOf(decl).Elem().FieldByName("Tag").Interface().(*ast.BasicLit)
 	comments := reflect.ValueOf(decl).Elem().FieldByName("Doc").Interface().(*ast.CommentGroup)
