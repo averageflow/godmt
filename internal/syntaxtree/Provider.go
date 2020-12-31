@@ -56,7 +56,7 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 		}
 
 		if d.Obj.Kind == ast.Typ {
-			result := parseStruct(d)
+			result := godmt.ParseStruct(d)
 
 			for i := range result {
 				_, ok := Result[CurrentFile].StructScanResult[result[i].Name]
@@ -65,7 +65,7 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 				}
 			}
 		} else if d.Obj.Kind == ast.Con || d.Obj.Kind == ast.Var {
-			result := parseConstantsAndVariables(d)
+			result := godmt.ParseConstantsAndVariables(d)
 
 			for i := range result {
 				_, ok := Result[CurrentFile].ScanResult[result[i].Name]
