@@ -49,7 +49,7 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo,funlen
 			result += fmt.Sprintf(
 				" * @const %s %s\n */\n",
 				entity.Name,
-				GetPHPCompatibleType(entity.Kind),
+				GetPHPCompatibleType(entity.Kind, false),
 			)
 			result += fmt.Sprintf(
 				"const %s = %s;\n\n",
@@ -83,7 +83,7 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo,funlen
 
 			result += fmt.Sprintf(
 				" * @const %s %s\n */\n",
-				TransformSliceTypeToPHP(entity.Kind),
+				TransformSliceTypeToPHP(entity.Kind, false),
 				entity.Name,
 			)
 
@@ -159,7 +159,7 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo,funlen
 						}
 					}
 
-					result += fmt.Sprintf("\t * @var %s $%s\n", TransformSliceTypeToPHP(entityField.Kind), tag)
+					result += fmt.Sprintf("\t * @var %s $%s\n", TransformSliceTypeToPHP(entityField.Kind, entityField.IsPointer), tag)
 					result += "\t */\n"
 					result += fmt.Sprintf("\tpublic array $%s;\n\n", tag)
 				default:
@@ -173,7 +173,7 @@ func (t *PHPTranslator) Translate() string { //nolint:gocognit,gocyclo,funlen
 						result += "\t */\n"
 					}
 
-					result += fmt.Sprintf("\tpublic %s $%s;\n\n", GetPHPCompatibleType(entityField.Kind), tag)
+					result += fmt.Sprintf("\tpublic %s $%s;\n\n", GetPHPCompatibleType(entityField.Kind, entityField.IsPointer), tag)
 				}
 			}
 

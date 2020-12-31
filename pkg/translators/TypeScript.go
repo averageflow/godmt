@@ -53,7 +53,7 @@ func (t *TypeScriptTranslator) Translate() string { //nolint:gocognit,gocyclo
 			result += fmt.Sprintf(
 				"export const %s: %s = {\n",
 				entity.Name,
-				TransformTypeScriptRecord(entity.Kind),
+				TransformTypeScriptRecord(entity.Kind, false),
 			)
 			result += fmt.Sprintf("%s\n", MapValuesToTypeScriptRecord(entity.Value.(map[string]string)))
 			result += "};\n\n"
@@ -61,7 +61,7 @@ func (t *TypeScriptTranslator) Translate() string { //nolint:gocognit,gocyclo
 			result += fmt.Sprintf(
 				"export const %s: %s = [\n",
 				entity.Name,
-				TransformSliceTypeToTypeScript(entity.Kind),
+				TransformSliceTypeToTypeScript(entity.Kind, false),
 			)
 			result += fmt.Sprintf("%s\n", godmt.SliceValuesToPrettyList(entity.Value.([]string)))
 			result += "];\n\n"
@@ -121,9 +121,9 @@ func (t *TypeScriptTranslator) Translate() string { //nolint:gocognit,gocyclo
 			} else {
 				switch entityField.InternalType {
 				case godmt.MapType:
-					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), TransformTypeScriptRecord(entityField.Kind))
+					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), TransformTypeScriptRecord(entityField.Kind, entityField.IsPointer))
 				case godmt.SliceType:
-					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), TransformSliceTypeToTypeScript(entityField.Kind))
+					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), TransformSliceTypeToTypeScript(entityField.Kind, entityField.IsPointer))
 				default:
 					result += fmt.Sprintf("\t%s: %s;\n", quoteWhenNeeded(tag), GetTypescriptCompatibleType(entityField.Kind, entityField.IsPointer))
 				}
