@@ -5,7 +5,6 @@
 [![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/averageflow/godmt)](https://pkg.go.dev/github.com/averageflow/godmt)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8ee5c4680a29aef11331/maintainability)](https://codeclimate.com/github/averageflow/godmt/maintainability)
 [![codecov](https://codecov.io/gh/averageflow/godmt/branch/master/graph/badge.svg?token=F4HW4K40T6)](https://codecov.io/gh/averageflow/godmt)
-[![Issues](https://img.shields.io/github/issues/averageflow/godmt)](#)
 [![License](https://img.shields.io/github/license/averageflow/godmt.svg)](https://github.com/averageflow/godmt/blob/master/LICENSE.md)
 
 GoDMT, the one and only Go Data Model Translator. The goal of this project is to provide a tool that can parse Go files
