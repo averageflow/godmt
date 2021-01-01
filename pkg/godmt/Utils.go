@@ -69,37 +69,38 @@ func SliceValuesToPrettyList(raw []string) string {
 }
 
 func CleanTagName(rawTagName string) string {
-	jsonRegex := regexp.MustCompile(`(?m)json:"[^"]+"`)
-	xmlRegex := regexp.MustCompile(`(?m)xml:"[^"]+"`)
-
-	var jsonTagName []string //nolint:prealloc
-
-	var xmlTagName []string //nolint:prealloc
-
-	// By default use JSON tag name
-	for _, match := range jsonRegex.FindAllString(rawTagName, -1) {
-		name := strings.TrimSpace(match)
-		name = strings.ReplaceAll(name, `json:"`, ``)
-		name = strings.ReplaceAll(name, `"`, ``)
-		jsonTagName = append(jsonTagName, name)
+	expressions := map[string]*regexp.Regexp{
+		`json:"`:         regexp.MustCompile(`(?m)json:"[^"]+"`),
+		`xml:"`:          regexp.MustCompile(`(?m)xml:"[^"]+"`),
+		`form:"`:         regexp.MustCompile(`(?m)form:"[^"]+"`),
+		`uri:"`:          regexp.MustCompile(`(?m)uri:"[^"]+"`),
+		`db:"`:           regexp.MustCompile(`(?m)db:"[^"]+"`),
+		`mapstructure:"`: regexp.MustCompile(`(?m)mapstructure:"[^"]+"`),
+		`header:"`:       regexp.MustCompile(`(?m)header:"[^"]+"`),
 	}
 
-	if len(jsonTagName) > 0 {
-		return strings.Join(jsonTagName, "")
+	var tagNames []string
+
+	for i := range expressions {
+		matches := expressions[i].FindAllString(rawTagName, -1)
+		if len(matches) == 0 {
+			continue
+		}
+
+		for j := range matches {
+			name := strings.TrimSpace(matches[j])
+			name = strings.ReplaceAll(name, i, ``)
+			name = strings.ReplaceAll(name, `"`, ``)
+			tagNames = append(tagNames, name)
+		}
+
+		break
 	}
 
-	// Alternatively use XML tag name
-	for _, match := range xmlRegex.FindAllString(rawTagName, -1) {
-		name := strings.TrimSpace(match)
-		name = strings.ReplaceAll(name, `xml:"`, ``)
-		name = strings.ReplaceAll(name, `"`, ``)
-		xmlTagName = append(xmlTagName, name)
+	if len(tagNames) > 0 {
+		return strings.Join(tagNames, "")
 	}
 
-	if len(xmlTagName) > 0 {
-		return strings.Join(xmlTagName, "")
-	}
-
-	// Fallback to the raw tag
-	return rawTagName
+	// Fallback to return an empty string
+	return ""
 }

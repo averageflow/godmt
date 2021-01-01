@@ -7,7 +7,8 @@ type ScannedType struct {
 	Kind         string      `json:"kind"`
 	Value        interface{} `json:"value"`
 	Doc          []string    `json:"doc"`
-	InternalType int         `json:"internalType"`
+	InternalType int         `uri:"internalType"`
+	Test         string
 }
 
 type ExtendedScannedType struct {

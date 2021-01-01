@@ -15,7 +15,8 @@ that include `var`, `const`, `map`, `struct` and `type` into an abstract syntax 
   <img width="250" height="150" src="web/DMT.png">
 </p>
 
-That AST will then be transformed into data models for several programming languages. Currently GoDMT can perform translations to:
+That AST will then be transformed into data models for several programming languages. Currently GoDMT can perform
+translations to:
 
 - TypeScript
 - Swift (using Decodable structs)
@@ -23,7 +24,8 @@ That AST will then be transformed into data models for several programming langu
 - PHP
 
 Some small adjustments may need to be made to integrate the output into a project, but this should already save you a
-lot of time and hassle, and will help you stay in sync with the Go version of your data models, in other languages. Comments will be carried over 😉.
+lot of time and hassle, and will help you stay in sync with the Go version of your data models, in other languages.
+Comments will be carried over 😉.
 
 Currently, the supported operating systems are all of UNIX family:
 
@@ -70,8 +72,55 @@ go run main.go -dir=../../tests/data/ -translation=ts
 After a successful run, the program will output a `result` folder in the current working directory with subfolders for
 respective scanned packages. Filenames will be respected and maintained, with only changes to the extension.
 
-
-
 ## Building
 
 To build this application as a binary simply navigate to `cmd/godmt` and run `go build`.
+
+## Tips
+
+### Tags and conversion
+GoDMT tries its best to obtain the translated field name of struct fields from their struct tag. We can only choose one
+tag to get its name to translate, and this happens in the following order of priority:
+
+- `json:"field"`
+- `xml:"field"`
+- `form:"field"`
+- `uri:"field"`
+- `db:"field"`
+- `mapstructure:"field"`
+- `header:"field"`
+
+If none of the above tag values are matched, then the translated name will remain as the original. As an example, a
+valid tag to translate to:
+
+```go
+type ExampleType struct {
+    Name         string      `json:"myFieldName"`
+}
+```
+
+will be converted to:
+
+```ts
+export interface ExampleType {
+  myFieldName: string
+}
+```
+
+but if we would have a non-valid or non-existent tag:
+
+```go
+type ExampleType struct {
+    Name         string      `whatever:"myFieldName"`
+    Age int 
+}
+```
+
+then it would be converted to:
+
+```ts
+export interface ExampleType {
+  Name: string
+  Age: number
+}
+```
