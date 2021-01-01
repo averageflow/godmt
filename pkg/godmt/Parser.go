@@ -132,26 +132,33 @@ func ParseComplexStructField(item *ast.Ident) *ScannedStructField {
 
 	objectType := reflect.ValueOf(decl).Elem().FieldByName("Type").Interface()
 
-	var kind string
-
-	var internalType int
+	result := &ScannedStructField{
+		Name:          item.Name,
+		Kind:          "",
+		Tag:           tag.Value,
+		Doc:           ExtractComments(comments),
+		ImportDetails: nil,
+		InternalType:  0,
+	}
 
 	switch objectTypeDetails := objectType.(type) {
 	case *ast.ArrayType:
-		internalType = SliceType
-		kind = GetSliceType(objectTypeDetails)
+		result.InternalType = SliceType
+
+		switch sliceElement := objectTypeDetails.Elt.(type) {
+		case *ast.StarExpr:
+			result.Kind = fmt.Sprintf("[]%s", reflect.ValueOf(sliceElement.X).Elem().FieldByName("Name"))
+
+		default:
+			result.Kind = GetSliceType(objectTypeDetails)
+			break
+		}
+
 	default:
 		return nil
 	}
 
-	return &ScannedStructField{
-		Name:          item.Name,
-		Kind:          kind,
-		Tag:           tag.Value,
-		Doc:           ExtractComments(comments),
-		ImportDetails: nil,
-		InternalType:  internalType,
-	}
+	return result
 }
 
 func ParseConstantsAndVariables(d *ast.Ident) []ScannedType {

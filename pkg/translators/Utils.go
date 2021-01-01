@@ -17,7 +17,7 @@ func IsEmbeddedStructForInheritance(field *godmt.ScannedStructField) bool {
 func GetTypescriptCompatibleType(goType string, isPointer bool) string {
 	result, ok := goTypeScriptTypeMappings[goType]
 	if !ok {
-		return fmt.Sprintf("%s | null", goType)
+		return goType
 	}
 
 	if isPointer {
@@ -30,7 +30,7 @@ func GetTypescriptCompatibleType(goType string, isPointer bool) string {
 func GetPHPCompatibleType(goType string, isPointer bool) string {
 	result, ok := goPHPTypeMappings[goType]
 	if !ok {
-		return fmt.Sprintf("?%s", goType)
+		return goType
 	}
 
 	if isPointer {
@@ -43,7 +43,7 @@ func GetPHPCompatibleType(goType string, isPointer bool) string {
 func GetSwiftCompatibleType(goType string, isPointer bool) string {
 	result, ok := goSwiftTypeMappings[goType]
 	if !ok {
-		return fmt.Sprintf("%s?", goType)
+		return goType
 	}
 
 	if isPointer {

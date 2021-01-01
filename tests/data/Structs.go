@@ -24,6 +24,12 @@ type ScannedStruct struct {
 	InternalType int      `xml:"internalType" binding:"required" validation:"required"`
 }
 
+type InheritSlice struct {
+	Structs         []ScannedStruct  `json:"structs"`
+	PointerStructs  *[]ScannedStruct `json:"pointerStructs"`
+	SliceOfPointers []*string        `json:"sliceOfPointers"`
+}
+
 type EmbeddedType struct {
 	ID   string `json:"id"`
 	Data struct {
