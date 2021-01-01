@@ -151,7 +151,6 @@ func ParseComplexStructField(item *ast.Ident) *ScannedStructField {
 
 		default:
 			result.Kind = GetSliceType(objectTypeDetails)
-			break
 		}
 
 	default:
