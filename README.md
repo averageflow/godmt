@@ -45,81 +45,11 @@ Feel free to browse some examples that I am happy to provide here:
 
 ## Usage
 
-```
-go run main.go -dir={scanDirectory} -translation={language} -preserve -tree
-```
+See the [CLI Usage wiki page](https://github.com/averageflow/godmt/wiki/CLI-usage) for more details on using the tool.
 
-- `scanDirectory` represents a string that is the relative path of the directory whose Go files you want to scan. The
-  scan occurs in a recursive manner, so all files from all contained folders will be scanned.
-- `language` represents the output mode. If the `-translation` flag is not specified it will default to JSON. Currently
-  supported options are:
-    - `ts` or `typescript` for TypeScript conversion
-    - `swift` for Swift conversion
-    - `json` for JSON conversion
-    - `php` for PHP conversion
-- `preserve` is an optional boolean flag which will make the output structs preserve the original names, instead of
-  using the (`json:"tag"`).
-- `tree` is an optional boolean that when present will prevent any file operations being performed, and instead will
-  show you the full abstract syntax tree of your files in the standard output.
-
-Example usage:
-
-```
-go run main.go -dir=../../tests/data/ -translation=ts
-```
-
-After a successful run, the program will output a `result` folder in the current working directory with subfolders for
-respective scanned packages. Filenames will be respected and maintained, with only changes to the extension.
+See the [Tags and Name Conversion section](https://github.com/averageflow/godmt/wiki/Tags-and-name-conversion) to understand more about how entities get parsed and converted to other languages.
 
 ## Building
 
 To build this application as a binary simply navigate to `cmd/godmt` and run `go build`.
 
-## Tips
-
-### Tags and conversion
-GoDMT tries its best to obtain the translated field name of struct fields from their struct tag. We can only choose one
-tag to get its name to translate, and this happens in the following order of priority:
-
-- `json:"field"`
-- `xml:"field"`
-- `form:"field"`
-- `uri:"field"`
-- `db:"field"`
-- `mapstructure:"field"`
-- `header:"field"`
-
-If none of the above tag values are matched, then the translated name will remain as the original. As an example, a
-valid tag to translate to:
-
-```go
-type ExampleType struct {
-    Name         string      `json:"myFieldName"`
-}
-```
-
-will be converted to:
-
-```ts
-export interface ExampleType {
-  myFieldName: string
-}
-```
-
-but if we would have a non-valid or non-existent tag:
-
-```go
-type ExampleType struct {
-    Name         string      `whatever:"myFieldName"`
-    Age int 
-}
-```
-
-then it would be converted to:
-
-```ts
-export interface ExampleType {
-  Name: string
-  Age: number
-}
-```
