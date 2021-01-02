@@ -13,6 +13,7 @@ type OperationMode struct {
 	TranslateMode string
 	PreserveNames bool
 	Tree          bool
+	Destination   string
 }
 
 func ParseApplicationConfig() OperationMode {
@@ -20,6 +21,7 @@ func ParseApplicationConfig() OperationMode {
 	translateMode := flag.String("translation", "json", "translation mode")
 	preserveNames := flag.Bool("preserve", false, "should preserve the original struct field names")
 	tree := flag.Bool("tree", false, "should show the abstract syntax tree")
+	destination := flag.String("o", fmt.Sprintf(".%sresult", string(os.PathSeparator)), "destination of output")
 
 	flag.Parse()
 
@@ -41,5 +43,6 @@ func ParseApplicationConfig() OperationMode {
 		TranslateMode: *translateMode,
 		PreserveNames: *preserveNames,
 		Tree:          *tree,
+		Destination:   *destination,
 	}
 }

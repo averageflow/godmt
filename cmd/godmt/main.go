@@ -40,7 +40,7 @@ func main() {
 
 	fmt.Println("Sorted parsed items successfully!")
 
-	utils.CreateResultFolder()
+	utils.CreateResultFolder(config.Destination)
 
 	var resultingOutput string
 
@@ -54,7 +54,7 @@ func main() {
 			Data:     syntaxtree.Result[i],
 		}
 
-		filename := fmt.Sprintf("./result%s", strings.ReplaceAll(i, config.WantedPath, ""))
+		filename := fmt.Sprintf("%s%s", config.Destination, strings.ReplaceAll(i, config.WantedPath, ""))
 
 		switch config.TranslateMode {
 		case translators.TypeScriptTranslationMode:
@@ -90,7 +90,7 @@ func main() {
 		}
 
 		packageName := strings.Split(strings.ReplaceAll(i, config.WantedPath, ""), string(os.PathSeparator))
-		utils.WriteResultToFile(resultingOutput, filename, packageName)
+		utils.WriteResultToFile(resultingOutput, filename, config.Destination, packageName)
 	}
 
 	bar.Finish()

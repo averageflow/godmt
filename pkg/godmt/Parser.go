@@ -58,20 +58,33 @@ func ParseStructField(item *ast.Field) *ScannedStructField {
 		pointer := item.Type.(*ast.StarExpr).X
 		switch value := pointer.(type) {
 		case *ast.ArrayType:
+			tag := item.Tag
+
+			var tagValue string
+			if tag != nil {
+				tagValue = tag.Value
+			}
+
 			return &ScannedStructField{
 				Doc:          ExtractComments(item.Doc),
 				Name:         item.Names[0].Name,
 				Kind:         GetSliceType(value),
-				Tag:          item.Tag.Value,
+				Tag:          tagValue,
 				InternalType: SliceType,
 				IsPointer:    true,
 			}
 		case *ast.Ident:
+			tag := item.Tag
+
+			var tagValue string
+			if tag != nil {
+				tagValue = tag.Value
+			}
 			return &ScannedStructField{
 				Doc:          ExtractComments(item.Doc),
 				Name:         item.Names[0].Name,
 				Kind:         value.Name,
-				Tag:          item.Tag.Value,
+				Tag:          tagValue,
 				InternalType: VarType,
 				IsPointer:    true,
 			}
@@ -132,10 +145,15 @@ func ParseComplexStructField(item *ast.Ident) *ScannedStructField {
 
 	objectType := reflect.ValueOf(decl).Elem().FieldByName("Type").Interface()
 
+	var tagValue string
+	if tag != nil {
+		tagValue = tag.Value
+	}
+
 	result := &ScannedStructField{
 		Name:          item.Name,
 		Kind:          "",
-		Tag:           tag.Value,
+		Tag:           tagValue,
 		Doc:           ExtractComments(comments),
 		ImportDetails: nil,
 		InternalType:  0,
