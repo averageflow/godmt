@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -39,10 +40,10 @@ func ParseApplicationConfig() OperationMode {
 	wantedPath = strings.TrimSuffix(wantedPath, string(os.PathSeparator))
 
 	return OperationMode{
-		WantedPath:    wantedPath,
+		WantedPath:    filepath.Clean(wantedPath),
 		TranslateMode: *translateMode,
 		PreserveNames: *preserveNames,
 		Tree:          *tree,
-		Destination:   *destination,
+		Destination:   filepath.Clean(*destination),
 	}
 }
