@@ -26,11 +26,15 @@ Some small adjustments may need to be made to integrate the output into a projec
 lot of time and hassle, and will help you stay in sync with the Go version of your data models, in other languages.
 Comments will be carried over 😉.
 
-Currently, the supported operating systems are all of UNIX family:
+Currently, the tested operating systems are:
 
-- Linux
-- BSD
-- macOS
+- Linux (amd64)
+- FreeBSD (amd64)
+- macOS (amd64)
+- Windows (amd64)
+
+Feel free to expand this list if you have successfully used the tool in other environments. You will find pre-compiled
+binaries of the tool in the releases page.
 
 ## Talk is cheap, show code
 
@@ -47,7 +51,8 @@ Feel free to browse some examples that I am happy to provide here:
 
 See the [CLI Usage wiki page](https://github.com/averageflow/godmt/wiki/CLI-usage) for more details on using the tool.
 
-See the [Tags and Name Conversion section](https://github.com/averageflow/godmt/wiki/Tags-and-name-conversion) to understand more about how entities get parsed and converted to other languages.
+See the [Tags and Name Conversion section](https://github.com/averageflow/godmt/wiki/Tags-and-name-conversion) to
+understand more about how entities get parsed and converted to other languages.
 
 ## Building
 
