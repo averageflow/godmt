@@ -74,6 +74,15 @@ func (v visitor) Visit(n ast.Node) ast.Visitor {
 				}
 			}
 		}
+	case *ast.ValueSpec:
+		result := godmt.ParseIotaConstants(d)
+
+		for i := range result {
+			_, ok := Result[CurrentFile].ScanResult[result[i].Name]
+			if !ok {
+				Result[CurrentFile].ScanResult[result[i].Name] = result[i]
+			}
+		}
 
 	default:
 		break

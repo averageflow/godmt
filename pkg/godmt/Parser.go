@@ -179,6 +179,20 @@ func ParseComplexStructField(item *ast.Ident) *ScannedStructField {
 	return result
 }
 
+func ParseIotaConstants(d *ast.ValueSpec) []ScannedType {
+	result := make([]ScannedType, 1)
+
+	result[0] = ScannedType{
+		Name:         d.Names[0].Name,
+		Kind:         "int",
+		Value:        fmt.Sprintf("%d", d.Names[0].Obj.Data),
+		Doc:          ExtractComments(d.Doc),
+		InternalType: ConstType,
+	}
+
+	return result
+}
+
 func ParseConstantsAndVariables(d *ast.Ident) []ScannedType {
 	var result []ScannedType
 
