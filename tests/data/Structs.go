@@ -20,8 +20,8 @@ type ExtendedScannedType struct {
 type ScannedStruct struct {
 	Doc          []string `json:"doc" binding:"required" validation:"required"`
 	Name         string   `json:"name" binding:"required" validation:"required"`
-	Fields       []bool   `json:"fields" binding:"required" validation:"required"`
-	InternalType int      `xml:"internalType" binding:"required" validation:"required"`
+	Fields       []bool   `json:"fields_test" binding:"required" validation:"required"`
+	InternalType int      `xml:"internal_type" binding:"required" validation:"required"`
 }
 
 type InheritSlice struct {

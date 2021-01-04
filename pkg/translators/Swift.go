@@ -102,7 +102,7 @@ func (t *SwiftTranslator) Translate() string { //nolint:gocognit,gocyclo
 				}
 			}
 
-			if len(entityField.SubFields) > 0 {
+			if len(entityField.SubFields) > 0 { //nolint:dupl
 				result += fmt.Sprintf("\tstruct %s {\n", quoteWhenNeeded(tag))
 
 				for k := range entityField.SubFields {
@@ -122,9 +122,9 @@ func (t *SwiftTranslator) Translate() string { //nolint:gocognit,gocyclo
 			} else {
 				switch entityField.InternalType {
 				case godmt.MapType:
-					result += fmt.Sprintf("\tvar %s: %s\n", tag, TransformSwiftRecord(entityField.Kind, entityField.IsPointer))
+					result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), TransformSwiftRecord(entityField.Kind, entityField.IsPointer))
 				case godmt.SliceType:
-					result += fmt.Sprintf("\tvar %s: %s\n", tag, TransformSliceTypeToSwift(entityField.Kind, entityField.IsPointer))
+					result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), TransformSliceTypeToSwift(entityField.Kind, entityField.IsPointer))
 				default:
 					result += fmt.Sprintf("\tvar %s: %s\n", toCamelCase(tag), GetSwiftCompatibleType(entityField.Kind, entityField.IsPointer))
 				}

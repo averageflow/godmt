@@ -54,7 +54,7 @@ func main() {
 			Data:     syntaxtree.Result[i],
 		}
 
-		filename := fmt.Sprintf("%s%s", config.Destination, strings.ReplaceAll(i, config.WantedPath, ""))
+		filename := utils.GetFileDestination(config.Destination, i, config.WantedPath)
 
 		switch config.TranslateMode {
 		case translators.TypeScriptTranslationMode:

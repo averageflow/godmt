@@ -102,7 +102,7 @@ func (t *TypeScriptTranslator) Translate() string { //nolint:gocognit,gocyclo
 				}
 			}
 
-			if len(entityField.SubFields) > 0 {
+			if len(entityField.SubFields) > 0 { //nolint:dupl
 				result += fmt.Sprintf("\t%s: {\n", quoteWhenNeeded(tag))
 
 				for k := range entityField.SubFields {

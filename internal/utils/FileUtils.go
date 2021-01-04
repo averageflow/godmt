@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 const (
@@ -51,4 +52,24 @@ func CreateResultFolder(destination string) {
 	} else if err != nil {
 		log.Println(err.Error())
 	}
+}
+
+func GetFileDestination(destination, filename, scanPath string) string {
+	filenameSplitPart := scanPath
+	pathParts := strings.Split(scanPath, string(os.PathSeparator))
+
+	if strings.Contains(pathParts[len(pathParts)-1], ".go") {
+		// If scanPath is a file, then we will not remove it from the file destination path
+		var filenameSplitParts []string
+
+		for i := 0; i < len(pathParts)-1; i++ {
+			filenameSplitParts = append(filenameSplitParts, pathParts[i])
+		}
+
+		filenameSplitPart = strings.Join(filenameSplitParts, string(os.PathSeparator))
+	}
+
+	resultingFile := strings.ReplaceAll(filename, filenameSplitPart, "")
+
+	return fmt.Sprintf("%s%s", destination, resultingFile)
 }

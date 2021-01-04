@@ -80,6 +80,7 @@ func ParseStructField(item *ast.Field) *ScannedStructField {
 			if tag != nil {
 				tagValue = tag.Value
 			}
+
 			return &ScannedStructField{
 				Doc:          ExtractComments(item.Doc),
 				Name:         item.Names[0].Name,

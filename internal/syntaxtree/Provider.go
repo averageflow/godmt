@@ -113,7 +113,7 @@ func ScanDir(path string, info os.FileInfo, err error) error {
 
 	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err.Error())
 	}
 
 	CurrentFile = path
