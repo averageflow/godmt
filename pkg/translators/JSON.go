@@ -7,7 +7,7 @@ import (
 	"github.com/averageflow/godmt/pkg/godmt"
 )
 
-type jsonFinalResult struct {
+type JSONFinalResult struct {
 	Enums map[string]godmt.ScannedType   `json:"enums"`
 	Types map[string]godmt.ScannedStruct `json:"types"`
 }
@@ -17,7 +17,7 @@ type JSONTranslator struct {
 }
 
 func (t *JSONTranslator) Translate() string {
-	payload := jsonFinalResult{
+	payload := JSONFinalResult{
 		Enums: t.Data.ScanResult,
 		Types: t.Data.StructScanResult,
 	}
