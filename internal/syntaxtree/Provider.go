@@ -68,10 +68,7 @@ func (v visitor) Visit(n ast.Node) ast.Visitor { //nolint:gocyclo
 			result := godmt.ParseConstantsAndVariables(d)
 
 			for i := range result {
-				_, ok := Result[CurrentFile].ScanResult[result[i].Name]
-				if !ok {
-					Result[CurrentFile].ScanResult[result[i].Name] = result[i]
-				}
+				Result[CurrentFile].ScanResult[result[i].Name] = result[i]
 			}
 		}
 	case *ast.ValueSpec:

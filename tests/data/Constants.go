@@ -17,3 +17,10 @@ const (
 	// ExampleBoolWithComment represents a bool with a comment line above it.
 	ExampleBoolWithComment = false
 )
+
+const (
+	IotaExampleInt = iota
+	IotaExampleFloat
+	IotaExampleString
+	IotaExampleBool
+)
