@@ -184,7 +184,6 @@ func TransformSwiftRecord(goMapType string, isPointer bool) string {
 	} else if strings.HasPrefix(lastType.Kind, "*[]") {
 		kind := strings.ReplaceAll(lastType.Kind, "*", "")
 		lastType.Kind = TransformSliceTypeToSwift(kind, true)
-
 	} else {
 		lastType.Kind = GetSwiftCompatibleType(lastType.Kind, false)
 	}
