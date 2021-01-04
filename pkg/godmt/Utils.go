@@ -33,6 +33,16 @@ func GetMapValueType(item ast.Expr) string {
 		return fmt.Sprintf("map[%s]%s", GetMapValueType(value.Key), GetMapValueType(value.Value))
 	case *ast.ArrayType:
 		return GetSliceType(value)
+	case *ast.StarExpr:
+		switch pointerItem := value.X.(type) {
+		case *ast.Ident:
+			return fmt.Sprintf("*%s", pointerItem.Name)
+		case *ast.ArrayType:
+			return fmt.Sprintf("*%s", GetSliceType(pointerItem))
+		default:
+			return "interface{}"
+		}
+
 	default:
 		return "interface{}"
 	}

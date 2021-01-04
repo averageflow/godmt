@@ -17,11 +17,11 @@ var goTypeScriptTypeMappings = map[string]string{ //nolint:gochecknoglobals
 	"string":      "string",
 	"bool":        "boolean",
 	"interface{}": "any",
-	"NullFloat64": "number | null",
-	"NullFloat32": "number | null",
-	"NullInt32":   "number | null",
-	"NullInt64":   "number | null",
-	"NullString":  "string | null",
+	"NullFloat64": "(number | null)",
+	"NullFloat32": "(number | null)",
+	"NullInt32":   "(number | null)",
+	"NullInt64":   "(number | null)",
+	"NullString":  "(string | null)",
 }
 
 type TypeScriptTranslator struct {

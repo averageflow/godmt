@@ -107,3 +107,93 @@ func TestTransformSwiftRecordPointer(t *testing.T) {
 		}
 	}
 }
+
+func TestGetTypescriptCompatibleType(t *testing.T) {
+	testTable := map[string]string{
+		"int":         "number",
+		"int32":       "number",
+		"int64":       "number",
+		"float":       "number",
+		"float32":     "number",
+		"float64":     "number",
+		"string":      "string",
+		"bool":        "boolean",
+		"interface{}": "any",
+		"NullFloat64": "(number | null)",
+		"NullFloat32": "(number | null)",
+		"NullInt32":   "(number | null)",
+		"NullInt64":   "(number | null)",
+		"NullString":  "(string | null)",
+		"*int":        "(number | null)",
+		"*string":     "(string | null)",
+		"*float":      "(number | null)",
+		"*bool":       "(boolean | null)",
+	}
+
+	for i := range testTable {
+		sut := GetTypescriptCompatibleType(i, false)
+		if sut != testTable[i] {
+			t.Errorf("Expected %s, got %s", testTable[i], sut)
+		}
+	}
+}
+
+func TestGetPHPCompatibleType(t *testing.T) {
+	testTable := map[string]string{
+		"int":         "int",
+		"int32":       "int",
+		"int64":       "int",
+		"float":       "float",
+		"float32":     "float",
+		"float64":     "float",
+		"string":      "string",
+		"bool":        "bool",
+		"interface{}": "",
+		"NullFloat64": "?float",
+		"NullFloat32": "?float",
+		"NullInt32":   "?int",
+		"NullInt64":   "?int",
+		"NullString":  "?string",
+		"*int":        "?int",
+		"*string":     "?string",
+		"*float":      "?float",
+		"*bool":       "?bool",
+	}
+
+	for i := range testTable {
+		sut := GetPHPCompatibleType(i, false)
+		if sut != testTable[i] {
+			t.Errorf("Expected %s, got %s", testTable[i], sut)
+		}
+	}
+}
+
+func TestGetSwiftCompatibleType(t *testing.T) {
+	testTable := map[string]string{
+		"int":         "Int",
+		"int32":       "Int",
+		"int64":       "Int",
+		"float":       "Float",
+		"float32":     "Float",
+		"float64":     "Float",
+		"string":      "String",
+		"bool":        "Bool",
+		"interface{}": "Any",
+		"NullFloat64": "Float?",
+		"NullFloat32": "Float?",
+		"NullInt32":   "Int?",
+		"NullInt64":   "Int?",
+		"NullString":  "String?",
+		"*int":        "Int?",
+		"*string":     "String?",
+		"*float":      "Float?",
+		"*bool":       "Bool?",
+	}
+
+	for i := range testTable {
+		sut := GetSwiftCompatibleType(i, false)
+		if sut != testTable[i] {
+			t.Errorf("Expected %s, got %s", testTable[i], sut)
+		}
+	}
+}

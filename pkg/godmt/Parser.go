@@ -158,6 +158,7 @@ func ParseComplexStructField(item *ast.Ident) *ScannedStructField {
 		Doc:           ExtractComments(comments),
 		ImportDetails: nil,
 		InternalType:  0,
+		IsPointer:     false,
 	}
 
 	switch objectTypeDetails := objectType.(type) {
@@ -166,8 +167,7 @@ func ParseComplexStructField(item *ast.Ident) *ScannedStructField {
 
 		switch sliceElement := objectTypeDetails.Elt.(type) {
 		case *ast.StarExpr:
-			result.Kind = fmt.Sprintf("[]%s", reflect.ValueOf(sliceElement.X).Elem().FieldByName("Name"))
-
+			result.Kind = fmt.Sprintf("[]*%s", reflect.ValueOf(sliceElement.X).Elem().FieldByName("Name"))
 		default:
 			result.Kind = GetSliceType(objectTypeDetails)
 		}
@@ -181,6 +181,10 @@ func ParseComplexStructField(item *ast.Ident) *ScannedStructField {
 
 func ParseIotaConstants(d *ast.ValueSpec) []ScannedType {
 	result := make([]ScannedType, 1)
+
+	if len(d.Names) < 1 {
+		return nil
+	}
 
 	result[0] = ScannedType{
 		Name:         d.Names[0].Name,

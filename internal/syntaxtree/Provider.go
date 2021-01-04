@@ -37,7 +37,7 @@ func WalkSyntaxTree(f *ast.File) { //nolint:interfacer
 
 // Visit represents the actions to be performed on every node of the tree
 // n represents the node, whose type can be obtained with fmt.Sprintf and %T.
-func (v visitor) Visit(n ast.Node) ast.Visitor {
+func (v visitor) Visit(n ast.Node) ast.Visitor { //nolint:gocyclo
 	if n == nil {
 		return nil
 	}

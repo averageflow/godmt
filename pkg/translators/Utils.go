@@ -15,6 +15,17 @@ func IsEmbeddedStructForInheritance(field *godmt.ScannedStructField) bool {
 }
 
 func GetTypescriptCompatibleType(goType string, isPointer bool) string {
+	if strings.HasPrefix(goType, "*") {
+		wantedType := strings.ReplaceAll(goType, "*", "")
+
+		result, ok := goTypeScriptTypeMappings[wantedType]
+		if !ok {
+			return goType
+		}
+
+		return fmt.Sprintf("(%s | null)", result)
+	}
+
 	result, ok := goTypeScriptTypeMappings[goType]
 	if !ok {
 		return goType
@@ -28,6 +39,17 @@ func GetTypescriptCompatibleType(goType string, isPointer bool) string {
 }
 
 func GetPHPCompatibleType(goType string, isPointer bool) string {
+	if strings.HasPrefix(goType, "*") {
+		wantedType := strings.ReplaceAll(goType, "*", "")
+
+		result, ok := goPHPTypeMappings[wantedType]
+		if !ok {
+			return goType
+		}
+
+		return fmt.Sprintf("?%s", result)
+	}
+
 	result, ok := goPHPTypeMappings[goType]
 	if !ok {
 		return goType
@@ -41,6 +63,17 @@ func GetPHPCompatibleType(goType string, isPointer bool) string {
 }
 
 func GetSwiftCompatibleType(goType string, isPointer bool) string {
+	if strings.HasPrefix(goType, "*") {
+		wantedType := strings.ReplaceAll(goType, "*", "")
+
+		result, ok := goSwiftTypeMappings[wantedType]
+		if !ok {
+			return goType
+		}
+
+		return fmt.Sprintf("%s?", result)
+	}
+
 	result, ok := goSwiftTypeMappings[goType]
 	if !ok {
 		return goType
@@ -86,6 +119,9 @@ func TransformTypeScriptRecord(goMapType string, isPointer bool) string {
 
 	if strings.HasPrefix(lastType.Kind, "[]") {
 		lastType.Kind = TransformSliceTypeToTypeScript(lastType.Kind, false)
+	} else if strings.HasPrefix(lastType.Kind, "*[]") {
+		kind := strings.ReplaceAll(lastType.Kind, "*", "")
+		lastType.Kind = TransformSliceTypeToTypeScript(kind, true)
 	} else {
 		lastType.Kind = GetTypescriptCompatibleType(lastType.Kind, false)
 	}
@@ -145,6 +181,10 @@ func TransformSwiftRecord(goMapType string, isPointer bool) string {
 
 	if strings.HasPrefix(lastType.Kind, "[]") {
 		lastType.Kind = TransformSliceTypeToSwift(lastType.Kind, false)
+	} else if strings.HasPrefix(lastType.Kind, "*[]") {
+		kind := strings.ReplaceAll(lastType.Kind, "*", "")
+		lastType.Kind = TransformSliceTypeToSwift(kind, true)
+
 	} else {
 		lastType.Kind = GetSwiftCompatibleType(lastType.Kind, false)
 	}
@@ -234,7 +274,7 @@ func TransformSliceTypeToSwift(rawSliceType string, isPointer bool) string {
 	if strings.Contains(result, "map") {
 		result = fmt.Sprintf("[%s]", TransformSwiftRecord(result, false))
 	} else {
-		result = fmt.Sprintf("[%s]", GetSwiftCompatibleType(result, isPointer))
+		result = fmt.Sprintf("[%s]", GetSwiftCompatibleType(result, false))
 	}
 
 	if isPointer {
