@@ -224,11 +224,11 @@ func TestMapValuesToTypeScriptRecord(t *testing.T) {
 
 	possibility1 := "\ttest1: example1,\n\ttest2: example2"
 	possibility2 := "\ttest2: example2,\n\ttest1: example1"
+
 	sut := MapValuesToTypeScriptRecord(testTable)
 	if sut != possibility1 && sut != possibility2 {
 		t.Errorf("Expected %s or %s, got %s", possibility1, possibility2, sut)
 	}
-
 }
 
 func TestMapValuesToPHPArray(t *testing.T) {
@@ -241,6 +241,7 @@ func TestMapValuesToPHPArray(t *testing.T) {
 
 	possibility1 := "\ttest1 => example1,\n\ttest2 => example2"
 	possibility2 := "\ttest2 => example2,\n\ttest1 => example1"
+
 	sut := MapValuesToPHPArray(testTable)
 	if sut != possibility1 && sut != possibility2 {
 		t.Errorf("Expected %s or %s, got %s", possibility1, possibility2, sut)
