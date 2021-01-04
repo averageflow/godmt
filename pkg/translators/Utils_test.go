@@ -7,6 +7,8 @@ import (
 )
 
 func TestIsEmbeddedStructForInheritance(t *testing.T) {
+	t.Parallel()
+
 	sut := godmt.ScannedStructField{
 		Name:          "",
 		Kind:          "",
@@ -29,6 +31,8 @@ func TestIsEmbeddedStructForInheritance(t *testing.T) {
 }
 
 func TestTransformTypeScriptRecord(t *testing.T) {
+	t.Parallel()
+
 	testTable := map[string]string{
 		"map[string]string":           "Record<string, string>",
 		"map[string]int":              "Record<string, number>",
@@ -49,6 +53,8 @@ func TestTransformTypeScriptRecord(t *testing.T) {
 }
 
 func TestTransformTypeScriptRecordPointer(t *testing.T) {
+	t.Parallel()
+
 	testTable := map[string]string{
 		"map[string]string":           "Record<string, string> | null",
 		"map[string]int":              "Record<string, number> | null",
@@ -69,6 +75,8 @@ func TestTransformTypeScriptRecordPointer(t *testing.T) {
 }
 
 func TestTransformSwiftRecord(t *testing.T) {
+	t.Parallel()
+
 	testTable := map[string]string{
 		"map[string]string":           "Dictionary<String, String>",
 		"map[string]int":              "Dictionary<String, Int>",
@@ -89,6 +97,8 @@ func TestTransformSwiftRecord(t *testing.T) {
 }
 
 func TestTransformSwiftRecordPointer(t *testing.T) {
+	t.Parallel()
+
 	testTable := map[string]string{
 		"map[string]string":           "Dictionary<String, String>?",
 		"map[string]int":              "Dictionary<String, Int>?",
@@ -109,6 +119,8 @@ func TestTransformSwiftRecordPointer(t *testing.T) {
 }
 
 func TestGetTypescriptCompatibleType(t *testing.T) {
+	t.Parallel()
+
 	testTable := map[string]string{
 		"int":         "number",
 		"int32":       "number",
@@ -139,6 +151,8 @@ func TestGetTypescriptCompatibleType(t *testing.T) {
 }
 
 func TestGetPHPCompatibleType(t *testing.T) {
+	t.Parallel()
+
 	testTable := map[string]string{
 		"int":         "int",
 		"int32":       "int",
@@ -169,6 +183,8 @@ func TestGetPHPCompatibleType(t *testing.T) {
 }
 
 func TestGetSwiftCompatibleType(t *testing.T) {
+	t.Parallel()
+
 	testTable := map[string]string{
 		"int":         "Int",
 		"int32":       "Int",
@@ -192,6 +208,177 @@ func TestGetSwiftCompatibleType(t *testing.T) {
 
 	for i := range testTable {
 		sut := GetSwiftCompatibleType(i, false)
+		if sut != testTable[i] {
+			t.Errorf("Expected %s, got %s", testTable[i], sut)
+		}
+	}
+}
+
+func TestMapValuesToTypeScriptRecord(t *testing.T) {
+	t.Parallel()
+
+	testTable := map[string]string{
+		"test1": "example1",
+		"test2": "example2",
+	}
+
+	possibility1 := "\ttest1: example1,\n\ttest2: example2"
+	possibility2 := "\ttest2: example2,\n\ttest1: example1"
+	sut := MapValuesToTypeScriptRecord(testTable)
+	if sut != possibility1 && sut != possibility2 {
+		t.Errorf("Expected %s or %s, got %s", possibility1, possibility2, sut)
+	}
+
+}
+
+func TestMapValuesToPHPArray(t *testing.T) {
+	t.Parallel()
+
+	testTable := map[string]string{
+		"test1": "example1",
+		"test2": "example2",
+	}
+
+	possibility1 := "\ttest1 => example1,\n\ttest2 => example2"
+	possibility2 := "\ttest2 => example2,\n\ttest1 => example1"
+	sut := MapValuesToPHPArray(testTable)
+	if sut != possibility1 && sut != possibility2 {
+		t.Errorf("Expected %s or %s, got %s", possibility1, possibility2, sut)
+	}
+}
+
+func TestTransformSliceTypeToTypeScript(t *testing.T) {
+	t.Parallel()
+
+	testTable := map[string]string{
+		"[]int":         "number[]",
+		"[]float":       "number[]",
+		"[]string":      "string[]",
+		"[]bool":        "boolean[]",
+		"[]interface{}": "any[]",
+		"[]*int":        "(number | null)[]",
+		"[]*string":     "(string | null)[]",
+		"[]*float":      "(number | null)[]",
+		"[]*bool":       "(boolean | null)[]",
+	}
+
+	for i := range testTable {
+		sut := TransformSliceTypeToTypeScript(i, false)
+		if sut != testTable[i] {
+			t.Errorf("Expected %s, got %s", testTable[i], sut)
+		}
+	}
+}
+
+func TestTransformSliceTypeToPHP(t *testing.T) {
+	t.Parallel()
+
+	testTable := map[string]string{
+		"[]int":         "int[]",
+		"[]float":       "float[]",
+		"[]string":      "string[]",
+		"[]bool":        "bool[]",
+		"[]interface{}": "array",
+		"[]*int":        "?int[]",
+		"[]*string":     "?string[]",
+		"[]*float":      "?float[]",
+		"[]*bool":       "?bool[]",
+	}
+
+	for i := range testTable {
+		sut := TransformSliceTypeToPHP(i, false)
+		if sut != testTable[i] {
+			t.Errorf("Expected %s, got %s", testTable[i], sut)
+		}
+	}
+}
+
+func TestTransformSliceTypeToSwift(t *testing.T) {
+	t.Parallel()
+
+	testTable := map[string]string{
+		"int":         "[Int]",
+		"float":       "[Float]",
+		"string":      "[String]",
+		"bool":        "[Bool]",
+		"interface{}": "[Any]",
+		"*int":        "[Int?]",
+		"*string":     "[String?]",
+		"*float":      "[Float?]",
+		"*bool":       "[Bool?]",
+	}
+
+	for i := range testTable {
+		sut := TransformSliceTypeToSwift(i, false)
+		if sut != testTable[i] {
+			t.Errorf("Expected %s, got %s", testTable[i], sut)
+		}
+	}
+}
+
+func TestTransformSliceTypeToTypeScriptPointer(t *testing.T) {
+	t.Parallel()
+
+	testTable := map[string]string{
+		"[]int":         "number[] | null",
+		"[]float":       "number[] | null",
+		"[]string":      "string[] | null",
+		"[]bool":        "boolean[] | null",
+		"[]interface{}": "any[] | null",
+		"[]*int":        "(number | null)[] | null",
+		"[]*string":     "(string | null)[] | null",
+		"[]*float":      "(number | null)[] | null",
+		"[]*bool":       "(boolean | null)[] | null",
+	}
+
+	for i := range testTable {
+		sut := TransformSliceTypeToTypeScript(i, true)
+		if sut != testTable[i] {
+			t.Errorf("Expected %s, got %s", testTable[i], sut)
+		}
+	}
+}
+
+func TestTransformSliceTypeToPHPPointer(t *testing.T) {
+	t.Parallel()
+
+	testTable := map[string]string{
+		"[]int":         "??int[]",
+		"[]float":       "??float[]",
+		"[]string":      "??string[]",
+		"[]bool":        "??bool[]",
+		"[]interface{}": "?array",
+		"[]*int":        "??int[]",
+		"[]*string":     "??string[]",
+		"[]*float":      "??float[]",
+		"[]*bool":       "??bool[]",
+	}
+
+	for i := range testTable {
+		sut := TransformSliceTypeToPHP(i, true)
+		if sut != testTable[i] {
+			t.Errorf("Expected %s, got %s", testTable[i], sut)
+		}
+	}
+}
+
+func TestTransformSliceTypeToSwiftPointer(t *testing.T) {
+	t.Parallel()
+
+	testTable := map[string]string{
+		"int":         "[Int]?",
+		"float":       "[Float]?",
+		"string":      "[String]?",
+		"bool":        "[Bool]?",
+		"interface{}": "[Any]?",
+		"*int":        "[Int?]?",
+		"*string":     "[String?]?",
+		"*float":      "[Float?]?",
+		"*bool":       "[Bool?]?",
+	}
+
+	for i := range testTable {
+		sut := TransformSliceTypeToSwift(i, true)
 		if sut != testTable[i] {
 			t.Errorf("Expected %s, got %s", testTable[i], sut)
 		}

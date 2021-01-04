@@ -3,6 +3,8 @@ package utils
 import "testing"
 
 func TestGetFileDestination(t *testing.T) {
+	t.Parallel()
+
 	testTable := [][]string{
 		{
 			"./result/Example.go", "./result", "../../tests/data/Example.go", "../../tests/data",

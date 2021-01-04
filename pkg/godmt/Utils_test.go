@@ -3,6 +3,8 @@ package godmt
 import "testing"
 
 func TestCleanTagName(t *testing.T) {
+	t.Parallel()
+
 	testTable := map[string]string{
 		"`json:\"testField\"`":                      "testField",
 		"`json:\"testField\" binding:\"required\"`": "testField",
