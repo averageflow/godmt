@@ -168,6 +168,15 @@ func ParseComplexStructField(item *ast.Ident) *ScannedStructField {
 		switch sliceElement := objectTypeDetails.Elt.(type) {
 		case *ast.StarExpr:
 			result.Kind = fmt.Sprintf("[]*%s", reflect.ValueOf(sliceElement.X).Elem().FieldByName("Name"))
+		case *ast.SelectorExpr:
+			packageName := fmt.Sprintf("%s", reflect.ValueOf(sliceElement.X).Elem().FieldByName("Name"))
+
+			result.ImportDetails = &ImportedEntityDetails{
+				EntityName:  sliceElement.Sel.Name,
+				PackageName: packageName,
+			}
+
+			result.Kind = fmt.Sprintf("[]%s", sliceElement.Sel.Name)
 		default:
 			result.Kind = GetSliceType(objectTypeDetails)
 		}

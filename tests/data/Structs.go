@@ -1,10 +1,13 @@
 package data
 
+import "io"
+
 // ScannedType represents a basic entity to be translated.
 // More specifically const and var items.
 type ScannedType struct {
 	Name         string      `json:"name"`
-	Kind         string      `json:"kind"`
+	Kind         io.Closer   `json:"kind"`
+	KindSlice    []io.Closer `json:"kind_slice"`
 	Value        interface{} `json:"value"`
 	Doc          []string    `json:"doc"`
 	InternalType int         `uri:"internalType"`

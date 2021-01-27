@@ -40,12 +40,12 @@ binaries of the tool in the releases page.
 
 Feel free to browse some examples that I am happy to provide here:
 
-- [Complex Structures](examples/ComplexStructures.md)
-- [Constants](examples/Constants.md)
-- [Maps](examples/Maps.md)
-- [Pointers](examples/Pointers.md)
-- [Slices](examples/Slices.md)
-- [Structs](examples/Structs.md)
+- [Complex Structures](web/examples/ComplexStructures.md)
+- [Constants](web/examples/Constants.md)
+- [Maps](web/examples/Maps.md)
+- [Pointers](web/examples/Pointers.md)
+- [Slices](web/examples/Slices.md)
+- [Structs](web/examples/Structs.md)
 
 ## Usage
 
