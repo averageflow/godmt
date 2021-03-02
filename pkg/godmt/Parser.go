@@ -9,14 +9,16 @@ import (
 func ParseStruct(d *ast.Ident) []ScannedStruct {
 	var result []ScannedStruct
 
-	structTypes := reflect.ValueOf(d.Obj.Decl).Elem().FieldByName("Type")
+	structTypes := reflect.ValueOf(d.Obj.Decl)
+
 	if !structTypes.IsValid() {
 		return result
 	}
 
-	switch structTypes.Interface().(type) {
+	typeOfStruct := structTypes.Elem().FieldByName("Type")
+	switch typeOfStruct.Interface().(type) {
 	case *ast.StructType:
-		fields := structTypes.Interface().(*ast.StructType)
+		fields := typeOfStruct.Interface().(*ast.StructType)
 		fieldList := fields.Fields.List
 
 		var rawScannedFields []ScannedStructField
